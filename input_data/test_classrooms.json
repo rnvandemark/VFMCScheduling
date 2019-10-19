@@ -1,0 +1,42 @@
+[
+	{
+		"room_code": "MB100",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "MB110",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "MB120",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "MB130",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "MB140",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "MB150",
+		"room_type": "cr"
+	},
+	{
+		"room_code": "LB100",
+		"room_type": "cl"
+	},
+	{
+		"room_code": "LB110",
+		"room_type": "cl"
+	},
+	{
+		"room_code": "LB120",
+		"room_type": "sl"
+	},
+	{
+		"room_code": "LB130",
+		"room_type": "sl"
+	}
+]

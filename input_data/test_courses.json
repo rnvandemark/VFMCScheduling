@@ -1,0 +1,106 @@
+[
+	{
+		"name": "Math Lab",
+		"course_code": "MA-100",
+		"credit_count": 1,
+		"standard_minutes_per_week": 50,
+		"section_count": 1,
+		"room_type": "cr"
+	},
+	{
+		"name": "College Algebra",
+		"course_code": "MA-101",
+		"credit_count": 3,
+		"standard_minutes_per_week": 150,
+		"section_count": 3,
+		"room_type": "cr"
+	},
+	{
+		"name": "Precalculus",
+		"course_code": "MA-103",
+		"credit_count": 4,
+		"standard_minutes_per_week": 240,
+		"section_count": 2,
+		"room_type": "cr"
+	},
+	{
+		"name": "Calculus 1",
+		"course_code": "MA-104",
+		"credit_count": 4,
+		"standard_minutes_per_week": 200,
+		"section_count": 2,
+		"room_type": "cr"
+	},
+	{
+		"name": "Foundations of Math",
+		"course_code": "MA-110",
+		"credit_count": 3,
+		"standard_minutes_per_week": 150,
+		"section_count": 4,
+		"room_type": "cr"
+	},
+	{
+		"name": "Principles of Statistics",
+		"course_code": "MA-113",
+		"credit_count": 4,
+		"standard_minutes_per_week": 200,
+		"section_count": 2,
+		"room_type": "cr"
+	},
+	{
+		"name": "General Physics",
+		"course_code": "PH-120",
+		"credit_count": 4,
+		"standard_minutes_per_week": 330,
+		"section_count": 2,
+		"room_type": "sl"
+	},
+	{
+		"name": "Physics 1",
+		"course_code": "PH-201",
+		"credit_count": 4,
+		"standard_minutes_per_week": 330,
+		"section_count": 2,
+		"room_type": "sl"
+	},
+	{
+		"name": "Physics 2",
+		"course_code": "PH-202",
+		"credit_count": 4,
+		"standard_minutes_per_week": 330,
+		"section_count": 1,
+		"room_type": "sl"
+	},
+	{
+		"name": "Engineering Graphics",
+		"course_code": "ER-105",
+		"credit_count": 3,
+		"standard_minutes_per_week": 75,
+		"section_count": 1,
+		"room_type": "cl"
+	},
+	{
+		"name": "Statics",
+		"course_code": "ER-201",
+		"credit_count": 3,
+		"standard_minutes_per_week": 150,
+		"section_count": 1,
+		"room_type": "cr"
+	},
+	{
+		"name": "Leadership Theory and Practice",
+		"course_code": "IN-106",
+		"credit_count": 3,
+		"standard_minutes_per_week": 150,
+		"section_count": 2,
+		"room_type": "cr"
+	},
+	{
+		"name": "Research Methods",
+		"course_code": "IN-200",
+		"credit_count": 3,
+		"standard_minutes_per_week": 150,
+		"section_count": 1,
+		"room_type": "cr"
+	}
+]

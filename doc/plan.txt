@@ -1,0 +1,16 @@
+- get a remaining class
+	- prefer classes that are involved in large restrictions first
+- attempt to book multiple sections with the same professor
+	- find a list of professors with the applicable department
+	- prefer a professor with multiple sections still open
+	- when preference is tied, pick a random one
+- rooms are more scarce of a resource, so find available rooms for that department and that professor
+	- prefer continuity in time, so room use is as efficient as possible
+	- when multiple are available and continuity is the same:
+		- use as much of a room as possible, try to keep some unused
+		- otherwise, pick a random one
+	- if none are available, try a different professor
+	- otherwise, pick a preferred schedule
+		- applicable day combinations are MWF, TR, MW, and MF
+		- attempt for continuous blocking
+			- find a class with a large enough chunk of time after it to fit another class

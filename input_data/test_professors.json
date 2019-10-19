@@ -1,0 +1,26 @@
+[
+	{
+		"first_name": "Marjorie",
+		"middle_name": "Gedney",
+		"last_name": "Vandemark",
+		"departments": ["ER", "PH", "IN"]
+	},
+	{
+		"first_name": "Nick",
+		"middle_name": "",
+		"last_name": "Vandemark",
+		"departments": ["MA"]
+	},
+	{
+		"first_name": "Kaeli",
+		"middle_name": "M.",
+		"last_name": "Vandemark",
+		"departments": ["MA", "IN", "ER"]
+	},
+	{
+		"first_name": "Maisi",
+		"middle_name": "Lynetree",
+		"last_name": "Vandemark",
+		"departments": ["MA", "IN", "ER"]
+	}
+]
