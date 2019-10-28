@@ -57,30 +57,31 @@ class TimeRange(namedtuple("TimeRangeTuple", ["start", "end"])):
 		
 		return floor((later[0] - earlier[1]).seconds / 60)
 	
-	def __str__(self):
-		#start_hour = str(self.start.hour + 1)
-		#if self.start.hour + 1 < 10:
-		#	start_hour = "0" + start_hour
-		#
-		#start_minute = str(self.start.minute)
-		#if self.start.minute < 10:
-		#	start_minute = "0" + start_minute
-		#
-		#end_hour = str(self.end.hour + 1)
-		#if self.end.hour + 1 < 10:
-		#	end_hour = "0" + end_hour
-		#
-		#end_minute = str(self.end.minute)
-		#if self.end.minute < 10:
-		#	end_minute = "0" + end_minute
-		#
-		#return "[{0}:{1} to {2}:{3}]".format(
-		#	start_hour,
-		#	start_minute,
-		#	end_hour,
-		#	end_minute
-		#)
+	def pretty_print(self):
+		start_hour = str(self.start.hour + 1)
+		if self.start.hour + 1 < 10:
+			start_hour = "0" + start_hour
 		
+		start_minute = str(self.start.minute)
+		if self.start.minute < 10:
+			start_minute = "0" + start_minute
+		
+		end_hour = str(self.end.hour + 1)
+		if self.end.hour + 1 < 10:
+			end_hour = "0" + end_hour
+		
+		end_minute = str(self.end.minute)
+		if self.end.minute < 10:
+			end_minute = "0" + end_minute
+		
+		return "{0}:{1} to {2}:{3}".format(
+			start_hour,
+			start_minute,
+			end_hour,
+			end_minute
+		)
+	
+	def __str__(self):
 		return "[{0} to {1}]".format(
 			self.start,
 			self.end

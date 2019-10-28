@@ -14,3 +14,24 @@
 		- applicable day combinations are MWF, TR, MW, and MF
 		- attempt for continuous blocking
 			- find a class with a large enough chunk of time after it to fit another class
+
+- landing page:
+	- buttons to other pages
+- input page:
+	- courses:
+		- name, department code, course number, number of credits, minutes per week, number of sections, required room type
+		- optional lab: number of credits, minutes per week, number of sections, required room type
+	- professors:
+		- first name, last name, (optional) middle name, applicable department codes
+	- classrooms:
+		- code, room type
+	- restrictions:
+		- type, course codes
+- generate page:
+	- select course, professor, classroom, and restrictions JSON file
+	- generate and view in a scrollable area
+	- option to edit generated options
+	- option to export to an excel sheet
+		- ordered by professor
+		- ordered by classroom
+		- ordered by course
