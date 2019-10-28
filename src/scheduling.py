@@ -1,12 +1,18 @@
 import logging
-from random import shuffle
 from math import floor
+from random import shuffle, getrandbits
+from copy import deepcopy
 
 MIN_MINS_BETWEEN_CLASSES = 10
+
 OBJECTIVE_CREDITS_PER_PROFESSOR = 15
+OBJECTIVE_WEIGHT_PER_PROFESSOR = 3 * OBJECTIVE_CREDITS_PER_PROFESSOR
+
+FORCE_LAB_ON_ONE_DAY = True
+ATTEMPT_EVEN_DISTRIBUTION = True
 
 from src.json_registrar import *
-from src.course import *
+from src.schedulable_element import *
 from src.classroom import *
 from src.professor import *
 from src.restriction import *
@@ -20,7 +26,7 @@ class Scheduler():
 		self.room_registrar        = ClassroomRegistrar(rooms_url)
 		self.restriction_registrar = RestrictionRegistrar(restrictions_url)
 		
-		self.courses_to_schedule = [
+		self.courses_in_registrar = [
 			Course(course_json) for course_json in self.course_registrar.course_list
 		]
 		
@@ -54,8 +60,11 @@ class Scheduler():
 			else:
 				raise ValueError("Can't process for invalid restriction type: {0}".format(restriction.type))
 		
-		shuffle(self.courses_to_schedule)
-		self.courses_to_schedule.sort(key=lambda course: course.restriction_count)
+		self.dept_relative_availability = None
+		self.update_relative_availabilities(True)
+		
+		shuffle(self.courses_in_registrar)
+		self.courses_in_registrar.sort(key=lambda c: self.get_element_sort_value(c))
 		
 		for dept_profs in self.profs_by_dept.values():
 			shuffle(dept_profs)
@@ -64,7 +73,7 @@ class Scheduler():
 		for course_code in course_code_list:
 			dept_code, course_number = course_code.split("-")
 			if course_number == "*":
-				for course in self.courses_to_schedule:
+				for course in self.courses_in_registrar:
 					if course.dept_code == dept_code:
 						course.restriction_count = course.restriction_count + 1
 			else:
@@ -74,106 +83,168 @@ class Scheduler():
 					logging.error("Invalid course number provided for restriction: %s" % course_number)
 					continue
 				
-				for course in self.courses_to_schedule:
+				for course in self.courses_in_registrar:
 					if (course.dept_code == dept_code) and (course.course_number == course_number):
 						course.restriction_count = course.restriction_count + 1
 						break
 				else:
 					logging.warning("Restriction for nonexistent department: %d" % course_number)
 	
-	#def get_credit_count_for(self, *dept_codes):
-	#	total_credits = 0
-	#	for dept_code in dept_codes:
-	#		if dept_code in self.courses_to_schedule:
-	#			for course in self.courses_to_schedule[dept_code].values():
-	#				total_credits = total_credits + (course.credits * course.sections)
-	#		else:
-	#			logging.warning("Attempted to search for a department with no courses in it: %s" % dept_code)
-	#	return total_credits
+	def update_relative_availabilities(self, reinitialize, dept_codes_list=None, existing_bookings={}):
+		dict_obj = None
+		
+		if reinitialize:
+			self.dept_relative_availability = {}
+			dict_obj = self.profs_by_dept
+		elif dept_codes_list:
+			dict_obj = {dc:self.profs_by_dept[dc] for dc in dept_codes_list}
+		else:
+			dict_obj = {}
+		
+		for dept_code, profs_list in self.profs_by_dept.items():
+			relative_availability = 0
+			
+			for prof in profs_list:
+				prof_existing_weight = Booking.get_total_finalized_weight_for(existing_bookings, prof)
+				relative_availability = relative_availability + OBJECTIVE_WEIGHT_PER_PROFESSOR - prof_existing_weight
+			
+			self.dept_relative_availability[dept_code] = 1 / relative_availability
 	
-	#def has_work_left(self):
-	#	for course in self.courses_to_schedule:
-	#		if not course.all_sections_booked():
-	#			return True
-	#	
-	#	return False
+	def get_element_sort_value(self, element):
+		# This first prioritizes schedulable elements with the most restrictions, then prioritizes the elements
+		# with the least cumulative amount of available time for all of the professors in this elements' department.
+		return (element.restriction_count, self.dept_relative_availability[element.dept_code])
+	
+	def plan_schedulable_element(self, element, existing_bookings, desired_professor=None, sort_after=True):
+		element_type = type(element)
+		
+		dept_code = None
+		if element_type == Course:
+			dept_code = element.dept_code
+		elif element_type == Lab:
+			dept_code = element.parent_course.dept_code
+		else:
+			raise ValueError("Impossible element type detected while planning: %s" % element_type.__name__)
+		
+		if dept_code not in self.profs_by_dept:
+			raise ValueError("Department code not recognized: %s" % dept_code)
+		elif len(self.profs_by_dept[dept_code]) < 1:
+			raise ValueError("No professors available for a element's department code: %s" % dept_code)
+		
+		desired_professor = self.profs_by_dept[dept_code][0]
+		prof_existing_weight = Booking.get_total_finalized_weight_for(existing_bookings, desired_professor)
+		weight_per_element_section = element.get_weight_per_section()
+		
+		sections_bookable = min(
+			2 if element_type == Lab else 3,
+			floor(element.get_unbooked_weight() / weight_per_element_section),
+			floor((OBJECTIVE_WEIGHT_PER_PROFESSOR - prof_existing_weight) / weight_per_element_section)
+		)
+		
+		if sections_bookable <= 0:
+			sections_bookable = 1
+		
+		desired_classroom_list = self.classrooms_by_type[element.classroom_type]
+		
+		preferred_days_per_week = None
+		if FORCE_LAB_ON_ONE_DAY and (element_type == Lab):
+			preferred_days_per_week = 1
+		elif ATTEMPT_EVEN_DISTRIBUTION:
+			preferred_days_per_week = 2 + getrandbits(1)
+		
+		# Gather restrictions from existing bookings. No need to worry about classes with the selected professor
+		# because those overlaps will be rejected in the DayTimeSlots' get_first_available routine, and we also
+		# only need to check professors that have existing bookings.
+		
+		restricted_tuples = []
+		for other_bookings in (b for p, b in existing_bookings.items() if p != desired_professor):
+			for existing_booking in other_bookings:
+				if not Restriction.can_overlap(
+					self.active_restrictions,
+					element.as_programmatic_string(),
+					existing_booking.element.as_programmatic_string()
+				):
+					restricted_tuples.extend(
+						(b[0], existing_booking.element) for b in existing_booking.blocks
+					)
+		
+		classroom_index = None
+		desired_classroom = None
+		for i in range(sections_bookable):
+			classroom_index = -1
+			
+			availability = None
+			while availability is None:
+				classroom_index = classroom_index + 1
+				if classroom_index >= len(desired_classroom_list):
+					raise ValueError("Ran out of possible classrooms for element: %s" % element.name)
+				desired_classroom = desired_classroom_list[classroom_index]
+				
+				availability = desired_classroom.slots.get_first_available(
+					element.mins_per_week,
+					existing_bookings.get(desired_professor, []),
+					restricted_tuples,
+					preferred_days_per_week=preferred_days_per_week
+				)
+			
+			new_booking = Booking(
+				element,
+				desired_professor,
+				(availability[0], availability[1], desired_classroom)
+			).finalize()
+			
+			if desired_professor not in existing_bookings:
+				existing_bookings[desired_professor] = []
+			existing_bookings[desired_professor].append(new_booking)
+		
+		if sort_after:
+			self.profs_by_dept[dept_code].sort(
+				key=lambda prof: Booking.get_total_finalized_weight_for(existing_bookings, prof),
+				reverse=False
+			)
+			
+			self.classrooms_by_type[element.classroom_type].sort(
+				key=lambda room: room.business(),
+				reverse=True
+			)
+		
+		return desired_professor
 	
 	def plan(self):
-		bookings = []
+		bookings = {}
 		
-		while len(self.courses_to_schedule) > 0:
-			course = self.courses_to_schedule.pop()
-			if course.all_sections_booked():
-				continue
+		courses_to_schedule = deepcopy(self.courses_in_registrar)
+		original_length = len(courses_to_schedule)
+		while len(courses_to_schedule) > 0:
+			stmt = str(round((1 - (len(courses_to_schedule) / original_length)) * 100, 4))
+			stmt = stmt + ("0" * (4 - len(stmt[stmt.find(".")+1:]))) + "%"
+			print(stmt, end="\r")
 			
-			credits_to_try = course.get_unbooked_section_credits()
-			while credits_to_try > 0:
-				desired_professor = self.profs_by_dept[course.dept_code][0]
-				
-				booked_credits = Booking.get_total_booked_credits_for(bookings, desired_professor)
-				sections_bookable = 0
-				if booked_credits + course.credit_count >= OBJECTIVE_CREDITS_PER_PROFESSOR:
-					sections_bookable = 1
-				else:
-					available_credits = OBJECTIVE_CREDITS_PER_PROFESSOR - booked_credits
-					sections_bookable = floor(min(credits_to_try, available_credits) / course.credit_count)
-				
-				desired_classroom_list = self.classrooms_by_type[course.classroom_type]
-				
-				days_per_week = 0
-				if course.credit_count == 1:
-					days_per_week = 1
-				elif course.mins_per_week % 3 != 0:
-					days_per_week = 2
-				elif course.mins_per_week < 150:
-					days_per_week = 1
-				else:
-					days_per_week = 3
-				
-				sections_booked = 0
-				classroom_index = -1
-				desired_classroom = None
-				for i in range(sections_bookable):
-					availability = None
-					while availability is None:
-						classroom_index = classroom_index + 1
-						if classroom_index >= len(desired_classroom_list):
-							raise ValueError("Impossible schedule!")
-						desired_classroom = desired_classroom_list[classroom_index]
-						
-						availability = desired_classroom.slots.get_first_available(
-							days_per_week,
-							course.mins_per_week,
-							[b for b in bookings if b.professor == desired_professor]
-						)
-					
-					potential_booking = Booking(
-						course,
-						desired_professor,
-						(availability[0], availability[1], desired_classroom)
-					)
-					
-					#if potential_booking.restrictions_overlap(self.active_restrictions, bookings):
-					#	self.courses_to_schedule.append(course)
-					#	self.courses_to_schedule.sort(key=lambda course: course.restriction_count)
-					#else:
-					#	potential_booking.finalize()
-					#	bookings.append(potential_booking)
-					#	sections_booked = sections_booked + 1
-					
-					potential_booking.finalize()
-					bookings.append(potential_booking)
-					sections_booked = sections_booked + 1
-				
-				self.profs_by_dept[course.dept_code].sort(
-					key=lambda prof: Booking.get_total_booked_credits_for(bookings, prof)
-				)
-				
-				self.classrooms_by_type[course.classroom_type].sort(
-					key=lambda room: room.business(),
-					reverse=True
-				)
-				
-				credits_to_try = credits_to_try - (sections_bookable * course.credit_count)
+			scheduled_professor = None
+			reattempt_scheduling = False
+			
+			course = courses_to_schedule.pop()
+			if not course.are_all_sections_booked():
+				scheduled_professor = self.plan_schedulable_element(course, bookings)
+				if not course.are_all_sections_booked():
+					reattempt_scheduling = True
+			
+			if course.lab:
+				if not course.lab.are_all_sections_booked():
+					scheduled_professor = self.plan_schedulable_element(course.lab, bookings, desired_professor=scheduled_professor)
+					if not course.lab.are_all_sections_booked():
+						reattempt_scheduling = True
+			
+			if reattempt_scheduling:
+				courses_to_schedule.append(course)
+				self.update_relative_availabilities(False, dept_codes_list=scheduled_professor.departments, existing_bookings=bookings)
+				courses_to_schedule.sort(key=lambda c: self.get_element_sort_value(c))
+			
+			#print("\n".join(["{0}\n\t{1}\n\t{2}\n\t{3}".format(
+			#	c.name,
+			#	c.restriction_count,
+			#	self.dept_relative_availability[c.dept_code],
+			#	1 / self.dept_relative_availability[c.dept_code]
+			#) for c in courses_to_schedule]), end="\n\n")
 		
 		return bookings

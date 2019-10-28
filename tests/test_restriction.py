@@ -62,3 +62,4 @@ def test_can_overlap():
 	assert not Restriction.can_overlap(restriction_list, "MS-302", "ER-301")
 	assert not Restriction.can_overlap(restriction_list, "ER-499", "MS-302")
 	assert Restriction.can_overlap(restriction_list, "ER-499", "ER-301")
+	assert Restriction.can_overlap(restriction_list, "FA-102", "FA-102")

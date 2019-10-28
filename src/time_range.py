@@ -86,6 +86,9 @@ class TimeRange(namedtuple("TimeRangeTuple", ["start", "end"])):
 			self.end
 		)
 	
+	def __lt__(self, other):
+		return self.end < other.end if self.start == other.start else self.start < other.start
+	
 	@staticmethod
 	def normalize(start_hour, start_minute, duration_hours, duration_minutes):
 		if (duration_hours < 0) or (duration_minutes < 0):

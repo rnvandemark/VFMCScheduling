@@ -30,14 +30,40 @@ class DayTimeSlots():
 		
 		return clashes
 	
-	def get_first_available(self, days_per_week, mins_per_week, professor_bookings):
+	def get_all_clashes_for(self, days, time_range, bookings, restricted_tuples):
+		clashes = self.clashes_with(days, time_range)
+		
+		for booking in bookings:
+			clashes.extend(booking.time_ranges_overlapping_with(days, time_range))
+		
+		clashes.extend(t[0].time_range for t in restricted_tuples if t[0].overlaps_with(days, time_range))
+		
+		return clashes
+	
+	def get_first_available(self, mins_per_week, professor_bookings, restricted_tuples, preferred_days_per_week=None):
+		if not preferred_days_per_week:
+			preferred_days_per_week = 3
+		
+		days_per_week = None
+		
+		if mins_per_week < preferred_days_per_week * 50:
+			days_per_week = 1
+		elif mins_per_week % preferred_days_per_week == 0:
+			days_per_week = preferred_days_per_week
+		elif mins_per_week % 2 == 0:
+			days_per_week = 2
+		else:
+			days_per_week = 3
+			
 		desired_days_list = DayOfWeek.optimal_lists_for(days_per_week)
-		mins_per_day = floor(mins_per_week / days_per_week)
 		
 		found_days = None
 		found_time_range = None
 		penalty = 0
+		
 		for desired_days in desired_days_list:
+			days_per_week = len(desired_days)
+			mins_per_day = floor(mins_per_week / days_per_week)
 			desired_time_range = TimeRange.normalize(
 				EARLIEST_START_TIME.hour, 
 				EARLIEST_START_TIME.minute,
@@ -45,10 +71,7 @@ class DayTimeSlots():
 				mins_per_day
 			)
 			
-			existing_clashes = self.clashes_with(desired_days, desired_time_range)
-			for booking in professor_bookings:
-				existing_clashes.extend(booking.time_ranges_overlapping_with(desired_days, desired_time_range))
-			
+			existing_clashes = self.get_all_clashes_for(desired_days, desired_time_range, professor_bookings, restricted_tuples)
 			while len(existing_clashes) > 0:
 				latest_end = max(time_range.end for time_range in existing_clashes)
 				earliest_start = TimeRange.time_translated_by(latest_end, 0, MIN_MINS_BETWEEN_CLASSES)
@@ -57,9 +80,7 @@ class DayTimeSlots():
 				if desired_time_range.start > LATEST_START_TIME:
 					break
 				
-				existing_clashes = self.clashes_with(desired_days, desired_time_range)
-				for booking in professor_bookings:
-					existing_clashes.extend(booking.time_ranges_overlapping_with(desired_days, desired_time_range))
+				existing_clashes = self.get_all_clashes_for(desired_days, desired_time_range, professor_bookings, restricted_tuples)
 				
 				penalty = sum(
 					time_range.minutes_between(desired_time_range) for time_range in existing_clashes

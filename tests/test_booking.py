@@ -2,7 +2,7 @@ from json import loads as json_loads
 from datetime import time
 from copy import copy
 
-from src.course import Course
+from src.schedulable_element import Course
 from src.professor import Professor
 from src.classroom import Classroom
 from src.booking import Booking
@@ -17,7 +17,8 @@ course0 = Course(json_loads('''
 		"credit_count": 4,
 		"standard_minutes_per_week": 200,
 		"section_count": 2,
-		"room_type": "cr"
+		"room_type": "cr",
+		"lab": null
 	}
 '''))
 course1 = Course(json_loads('''
@@ -27,7 +28,8 @@ course1 = Course(json_loads('''
 		"credit_count": 3,
 		"standard_minutes_per_week": 150,
 		"section_count": 3,
-		"room_type": "cr"
+		"room_type": "cr",
+		"lab": null
 	}
 '''))
 course2 = Course(json_loads('''
@@ -37,7 +39,8 @@ course2 = Course(json_loads('''
 		"credit_count": 3,
 		"standard_minutes_per_week": 150,
 		"section_count": 1,
-		"room_type": "cr"
+		"room_type": "cr",
+		"lab": null
 	}
 '''))
 course3 = Course(json_loads('''
@@ -47,7 +50,8 @@ course3 = Course(json_loads('''
 		"credit_count": 4,
 		"standard_minutes_per_week": 330,
 		"section_count": 2,
-		"room_type": "sl"
+		"room_type": "sl",
+		"lab": null
 	}
 '''))
 
@@ -136,16 +140,17 @@ def test_finalize():
 	
 	for c in [c0, c1]:
 		for i in range(c.section_count):
-			d, tr, _ = cr.slots.get_first_available(days_per_week, c.mins_per_week, bookings)
+			d, tr, _ = cr.slots.get_first_available(c.mins_per_week, bookings, [], preferred_days_per_week=days_per_week)
 			b = Booking(c, professor0, (d, tr, cr))
 			
 			assert b.section_number == -1
 			assert lamb(bookings)
 			
-			b.finalize()
+			return_val = b.finalize()
 			bookings.append(b)
 			
 			assert b.section_number == i
+			assert return_val == b
 			assert lamb(bookings)
 
 def test_time_ranges_overlapping_with():
@@ -216,44 +221,74 @@ def test_time_ranges_overlapping_with():
 	expected_blocks = [TimeRange.normalize(11, 0, 1, 15)]
 	assert b3.time_ranges_overlapping_with(days, time_range) == expected_blocks
 
-def test_get_booked_credits_for():
-	c0_credit_count = course0.credit_count
-	c1_credit_count = course1.credit_count
+def test_get_finalized_weight():
+	c0_weight_per_section = course0.get_weight_per_section()
+	c1_weight_per_section = course1.get_weight_per_section()
 	
 	b0 = copy(booking0)
-	assert b0.get_booked_credits_for(professor0) == 0
-	assert b0.get_booked_credits_for(professor1) == 0
+	assert b0.get_finalized_weight() == 0
 	b0.finalize()
-	assert b0.get_booked_credits_for(professor0) == c0_credit_count
-	assert b0.get_booked_credits_for(professor1) == 0
+	assert b0.get_finalized_weight() == c0_weight_per_section
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("TR")) == c0_weight_per_section
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("T")) == c0_weight_per_section / 2
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("R")) == c0_weight_per_section / 2
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("MWF")) == 0
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("URS")) == c0_weight_per_section / 2
+	assert b0.get_finalized_weight(days=DayOfWeek.list_from_string("MTW")) == c0_weight_per_section / 2
+	assert b0.get_finalized_weight(days=[]) == 0
 	
 	b1 = copy(booking1)
-	assert b1.get_booked_credits_for(professor0) == 0
-	assert b1.get_booked_credits_for(professor1) == 0
+	assert b1.get_finalized_weight() == 0
 	b1.finalize()
-	assert b1.get_booked_credits_for(professor0) == c0_credit_count
-	assert b1.get_booked_credits_for(professor1) == 0
+	assert b1.get_finalized_weight() == c0_weight_per_section
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("TR")) == c0_weight_per_section
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("T")) == c0_weight_per_section / 2
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("R")) == c0_weight_per_section / 2
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("MWF")) == 0
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("MTWRF")) == c0_weight_per_section
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("URS")) == c0_weight_per_section / 2
+	assert b1.get_finalized_weight(days=DayOfWeek.list_from_string("MTW")) == c0_weight_per_section / 2
+	assert b1.get_finalized_weight(days=[]) == 0
 	
 	b2 = copy(booking2)
-	assert b2.get_booked_credits_for(professor0) == 0
-	assert b2.get_booked_credits_for(professor1) == 0
+	assert b2.get_finalized_weight() == 0
 	b2.finalize()
-	assert b2.get_booked_credits_for(professor0) == 0
-	assert b2.get_booked_credits_for(professor1) == c1_credit_count
+	assert b2.get_finalized_weight() == c1_weight_per_section
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("MWF")) == c1_weight_per_section
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("MW")) == c1_weight_per_section * 2 / 3
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("F")) == c1_weight_per_section / 3
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("TR")) == 0
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("T")) == 0
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("MTWRF")) == c1_weight_per_section
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("UMT")) == c1_weight_per_section / 3
+	assert b2.get_finalized_weight(days=DayOfWeek.list_from_string("MTW")) == c1_weight_per_section * 2 / 3
+	assert b2.get_finalized_weight(days=[]) == 0
 	
 	b3 = copy(booking3)
-	assert b3.get_booked_credits_for(professor0) == 0
-	assert b3.get_booked_credits_for(professor1) == 0
+	assert b3.get_finalized_weight() == 0
 	b3.finalize()
-	assert b3.get_booked_credits_for(professor0) == 0
-	assert b3.get_booked_credits_for(professor1) == c1_credit_count
+	assert b3.get_finalized_weight() == c1_weight_per_section
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("TR")) == c1_weight_per_section
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("T")) == c1_weight_per_section / 2
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("R")) == c1_weight_per_section / 2
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("MWF")) == 0
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("MTWRF")) == c1_weight_per_section
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("URS")) == c1_weight_per_section / 2
+	assert b3.get_finalized_weight(days=DayOfWeek.list_from_string("MTW")) == c1_weight_per_section / 2
+	assert b3.get_finalized_weight(days=[]) == 0
 	
 	b4 = copy(booking4)
-	assert b4.get_booked_credits_for(professor0) == 0
-	assert b4.get_booked_credits_for(professor1) == 0
+	assert b4.get_finalized_weight() == 0
 	b4.finalize()
-	assert b4.get_booked_credits_for(professor0) == c1_credit_count
-	assert b4.get_booked_credits_for(professor1) == 0
+	assert b4.get_finalized_weight() == c1_weight_per_section
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("TR")) == c1_weight_per_section
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("T")) == c1_weight_per_section / 2
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("R")) == c1_weight_per_section / 2
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("MWF")) == 0
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("MTWRF")) == c1_weight_per_section
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("URS")) == c1_weight_per_section / 2
+	assert b4.get_finalized_weight(days=DayOfWeek.list_from_string("MTW")) == c1_weight_per_section / 2
+	assert b4.get_finalized_weight(days=[]) == 0
 
 def test_restrictions_overlap():
 	r0 = Restriction(json_loads('''

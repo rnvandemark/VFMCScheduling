@@ -11,11 +11,15 @@ class Restriction():
 		self.contents = json_obj["contents"]
 	
 	def can_overlap_with(self, course_code0, course_code1):
+		if course_code0 == course_code1:
+			return True
+		
 		if self.type == RestrictionType.SINGLE_GROUP:
 			return not (
 				Restriction.course_is_in(course_code0, self.contents)
 					and Restriction.course_is_in(course_code1, self.contents)
 			)
+		
 		elif self.type == RestrictionType.MULTIPLE_GROUPS:
 			num_groups = len(self.contents)
 			for i in range(num_groups):

@@ -6,7 +6,7 @@ from src.day_of_week import DayOfWeek
 from src.time_range import TimeRange
 from src.days_time_range_pair import DaysTimeRangePair
 from src.professor import Professor
-from src.course import Course
+from src.schedulable_element import Course
 from src.classroom import Classroom
 from src.booking import Booking
 
@@ -74,7 +74,8 @@ def test_get_first_available():
 			"credit_count": 1,
 			"standard_minutes_per_week": 50,
 			"section_count": 1,
-			"room_type": "cr"
+			"room_type": "cr",
+			"lab": null
 		}
 	'''))
 
@@ -85,7 +86,8 @@ def test_get_first_available():
 			"credit_count": 3,
 			"standard_minutes_per_week": 150,
 			"section_count": 2,
-			"room_type": "cr"
+			"room_type": "cr",
+			"lab": null
 		}
 	'''))
 
@@ -96,7 +98,8 @@ def test_get_first_available():
 			"credit_count": 3,
 			"standard_minutes_per_week": 150,
 			"section_count": 3,
-			"room_type": "cr"
+			"room_type": "cr",
+			"lab": null
 		}
 	'''))
 
@@ -107,7 +110,8 @@ def test_get_first_available():
 			"credit_count": 4,
 			"standard_minutes_per_week": 200,
 			"section_count": 2,
-			"room_type": "cr"
+			"room_type": "cr",
+			"lab": null
 		}
 	'''))
 	
@@ -128,177 +132,178 @@ def test_get_first_available():
 	'''))
 	
 	bookings = []
+	no_restrictions = []
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=7), end=time(hour=7, minute=50))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=7), end=time(hour=8, minute=15))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=7), end=time(hour=7, minute=50))
 	
-	booking = Booking(
-		course0,
-		professor,
-		(DayOfWeek.list_from_string("M"), TimeRange.normalize(7, 0, 0, 50), classroom)
+	bookings.append(
+		Booking(
+			course0,
+			professor,
+			(DayOfWeek.list_from_string("M"), TimeRange.normalize(7, 0, 0, 50), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=8), end=time(hour=8, minute=50))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=7), end=time(hour=8, minute=15))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=8), end=time(hour=8, minute=50))
 	
-	booking = Booking(
-		course1,
-		professor,
-		(DayOfWeek.list_from_string("F"), TimeRange.normalize(8, 0, 2, 30), classroom)
+	bookings.append(
+		Booking(
+			course1,
+			professor,
+			(DayOfWeek.list_from_string("F"), TimeRange.normalize(8, 0, 2, 30), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=8), end=time(hour=8, minute=50))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=7), end=time(hour=8, minute=15))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=10, minute=40), end=time(hour=11, minute=30))
 	
-	booking = Booking(
-		course1,
-		professor,
-		(DayOfWeek.list_from_string("T"), TimeRange.normalize(7, 0, 2, 30), classroom)
+	bookings.append(
+		Booking(
+			course1,
+			professor,
+			(DayOfWeek.list_from_string("T"), TimeRange.normalize(7, 0, 2, 30), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=8), end=time(hour=8, minute=50))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=9, minute=40), end=time(hour=10, minute=55))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=10, minute=40), end=time(hour=11, minute=30))
 	
-	booking = Booking(
-		course3,
-		professor,
-		(DayOfWeek.list_from_string("M"), TimeRange.normalize(8, 0, 0, 150), classroom),
-		(DayOfWeek.list_from_string("F"), TimeRange.normalize(10, 40, 0, 50), classroom)
+	bookings.append(
+		Booking(
+			course3,
+			professor,
+			(DayOfWeek.list_from_string("M"), TimeRange.normalize(8, 0, 0, 150), classroom),
+			(DayOfWeek.list_from_string("F"), TimeRange.normalize(10, 40, 0, 50), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=10, minute=40), end=time(hour=11, minute=30))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=9, minute=40), end=time(hour=10, minute=55))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=11, minute=40), end=time(hour=12, minute=30))
 	
-	booking = Booking(
-		course3,
-		professor,
-		(DayOfWeek.list_from_string("TR"), TimeRange.normalize(9, 40, 1, 40), classroom)
+	bookings.append(
+		Booking(
+			course3,
+			professor,
+			(DayOfWeek.list_from_string("TR"), TimeRange.normalize(9, 40, 1, 40), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=10, minute=40), end=time(hour=11, minute=30))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=11, minute=30), end=time(hour=12, minute=45))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=11, minute=40), end=time(hour=12, minute=30))
 	
-	booking = Booking(
-		course2,
-		professor,
-		(DayOfWeek.list_from_string("MWF"), TimeRange.normalize(11, 40, 0, 50), classroom)
+	bookings.append(
+		Booking(
+			course2,
+			professor,
+			(DayOfWeek.list_from_string("MWF"), TimeRange.normalize(11, 40, 0, 50), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=10, minute=40), end=time(hour=11, minute=30))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=11, minute=30), end=time(hour=12, minute=45))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=12, minute=40), end=time(hour=13, minute=30))
 	
-	booking = Booking(
-		course2,
-		professor,
-		(DayOfWeek.list_from_string("M"), TimeRange.normalize(10, 40, 0, 50), classroom),
-		(DayOfWeek.list_from_string("TR"), TimeRange.normalize(11, 30, 0, 50), classroom)
+	bookings.append(
+		Booking(
+			course2,
+			professor,
+			(DayOfWeek.list_from_string("M"), TimeRange.normalize(10, 40, 0, 50), classroom),
+			(DayOfWeek.list_from_string("TR"), TimeRange.normalize(11, 30, 0, 50), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=12, minute=40), end=time(hour=13, minute=30))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=12, minute=30), end=time(hour=13, minute=45))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=12, minute=40), end=time(hour=13, minute=30))
 	
-	booking = Booking(
-		course2,
-		professor,
-		(DayOfWeek.list_from_string("MWF"), TimeRange.normalize(12, 40, 0, 50), classroom)
+	bookings.append(
+		Booking(
+			course2,
+			professor,
+			(DayOfWeek.list_from_string("MWF"), TimeRange.normalize(12, 40, 0, 50), classroom)
+		).finalize()
 	)
-	booking.finalize()
-	bookings.append(booking)
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(1, 50, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(50, bookings, no_restrictions, preferred_days_per_week=1)
 	assert found_days == DayOfWeek.list_from_string("M")
 	assert found_time_range == TimeRange(start=time(hour=13, minute=40), end=time(hour=14, minute=30))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(2, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=2)
 	assert found_days == DayOfWeek.list_from_string("TR")
 	assert found_time_range == TimeRange(start=time(hour=12, minute=30), end=time(hour=13, minute=45))
 	
-	found_days, found_time_range, _ = classroom.slots.get_first_available(3, 150, bookings)
+	found_days, found_time_range, _ = classroom.slots.get_first_available(150, bookings, no_restrictions, preferred_days_per_week=3)
 	assert found_days == DayOfWeek.list_from_string("MWF")
 	assert found_time_range == TimeRange(start=time(hour=13, minute=40), end=time(hour=14, minute=30))

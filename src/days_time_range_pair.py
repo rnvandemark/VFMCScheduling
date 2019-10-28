@@ -19,6 +19,9 @@ class DaysTimeRangePair(namedtuple("DaysTimeRangePairTuple", ["days", "time_rang
 			str(self.time_range)
 		)
 	
+	def __lt__(self, other):
+		return self.days < other.days if self.time_range == other.time_range else self.time_range < other.time_range
+	
 	@staticmethod
 	def factory_from_days_string(days, time_range):
 		return DaysTimeRangePair(days=DayOfWeek.list_from_string(days), time_range=time_range)

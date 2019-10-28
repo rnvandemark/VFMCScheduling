@@ -12,6 +12,9 @@ class DayOfWeek(Enum):
 	def __str__(self):
 		return self.name
 	
+	def __lt__(self, other):
+		return DayOfWeek.ORDERED_INDICES[self] < DayOfWeek.ORDERED_INDICES[other]
+	
 	@staticmethod
 	def get_empty_dict(obj_type):
 		return {day:obj_type() for day in DayOfWeek}
@@ -54,3 +57,7 @@ class DayOfWeek(Enum):
 			]
 		else:
 			return None
+
+DayOfWeek.ORDERED_INDICES = DayOfWeek.get_empty_dict(int)
+for i, d in enumerate(DayOfWeek):
+	DayOfWeek.ORDERED_INDICES[d] = i
