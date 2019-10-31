@@ -1,5 +1,6 @@
 from tkinter import Frame, Button, Label
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL.ImageTk import PhotoImage
 from functools import partial
 
 from ui.page_panel import PagePanel
@@ -14,7 +15,7 @@ class GUI(Frame):
 	def __init__(self, *args, **kwargs):
 		Frame.__init__(self, *args, **kwargs)
 		
-		background_image = ImageTk.PhotoImage(
+		background_image = PhotoImage(
 			Image.open("./resources/vfmc_logo.jpeg").resize((400, 200), Image.ANTIALIAS))
 		background_label = Label(image=background_image)
 		background_label.image = background_image

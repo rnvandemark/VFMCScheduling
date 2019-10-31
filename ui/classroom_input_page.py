@@ -1,4 +1,4 @@
-from tkinter import Frame, Entry
+from tkinter import Frame, Entry, StringVar
 
 from ui.base_input_page import BaseInputPage
 
@@ -7,21 +7,31 @@ class ClassroomInputPage(BaseInputPage):
 	def __init__(self, *args, **kwargs):
 		BaseInputPage.__init__(self, "Classroom", *args, **kwargs)
 		
-		column_frame = Frame(self)
-		column_frame.pack(side="right", fill="x", expand=True)
-		
-		_, entry_code, var_code = BaseInputPage.get_labeled_frame(
-			column_frame,
+		code_var = StringVar(self.input_widgets_frame)
+		_, _, code_entry = BaseInputPage.get_labeled_input_field(
+			self.input_widgets_frame,
 			"Classroom Code",
-			"Entry"
+			"Entry",
+			textvariable=code_var
 		)
-		self.input_elements.append((entry_code, var_code, ""))
+		self.input_elements.append((code_entry, code_var, ""))
 		
-		options_type = ["Standard", "Computer Lab", "Science Lab"]
-		_, entry_type, var_type = BaseInputPage.get_labeled_frame(
-			column_frame,
+		type_options = ["Standard", "Computer Lab", "Science Lab"]
+		type_var = StringVar(self.input_widgets_frame)
+		_, _, type_entry = BaseInputPage.get_labeled_input_field(
+			self.input_widgets_frame,
 			"Classroom Type",
 			"OptionMenu",
-			*options_type
+			type_var,
+			*type_options
 		)
-		self.input_elements.append((entry_type, var_type, options_type[0]))
+		self.input_elements.append((type_entry, type_var, type_options[0]))
+	
+	def stringify_element(self):
+		raise NotImplementedError()
+	
+	def write_elements(self):
+		raise NotImplementedError()
+	
+	def parse_elements_from(self, filename):
+		raise NotImplementedError()

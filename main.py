@@ -68,7 +68,7 @@ def main():
 		root = Tk()
 		gui = GUI(root)
 		gui.pack(side="top", fill="both", expand=True)
-		root.wm_geometry("1000x450")
+		root.wm_geometry("1200x600")
 		root.mainloop()
 	
 	#
