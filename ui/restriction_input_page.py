@@ -5,11 +5,14 @@ class RestrictionInputPage(BaseInputPage):
 	def __init__(self, *args, **kwargs):
 		BaseInputPage.__init__(self, "Restriction", *args, **kwargs)
 	
-	def stringify_element(self):
+	def validate_input(self):
 		raise NotImplementedError()
 	
-	def write_elements(self):
+	def objectify_input(self):
 		raise NotImplementedError()
 	
-	def parse_elements_from(self, filename):
+	def deobjectify_element(self, obj):
+		raise NotImplementedError()
+	
+	def stringify_element(self, obj):
 		raise NotImplementedError()
