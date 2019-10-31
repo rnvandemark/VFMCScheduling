@@ -18,15 +18,20 @@
 - landing page:
 	- buttons to other pages
 - input page:
-	- courses:
-		- name, department code, course number, number of credits, minutes per week, number of sections, required room type
-		- optional lab: number of credits, minutes per week, number of sections, required room type
-	- professors:
-		- first name, last name, (optional) middle name, applicable department codes
-	- classrooms:
-		- code, room type
-	- restrictions:
-		- type, course codes
+	- data to input:
+		- courses:
+			- name, department code, course number, number of credits, minutes per week, number of sections, required room type
+			- optional lab: number of credits, minutes per week, number of sections, required room type
+		- professors:
+			- first name, last name, (optional) middle name, applicable department codes
+		- classrooms:
+			- code, room type
+		- restrictions:
+			- type, course codes
+	- options:
+		- create new empty set of (datatype)
+		- edit existing set of (datatype)
+		- copy existing set of (datatype) to create a new set
 - generate page:
 	- select course, professor, classroom, and restrictions JSON file
 	- generate and view in a scrollable area
