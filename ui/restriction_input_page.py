@@ -16,3 +16,6 @@ class RestrictionInputPage(BaseInputPage):
 	
 	def stringify_element(self, obj):
 		raise NotImplementedError()
+	
+	def refresh_inputs(self):
+		raise NotImplementedError()

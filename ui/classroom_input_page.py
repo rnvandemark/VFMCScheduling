@@ -1,7 +1,6 @@
 from tkinter import Frame, Entry, StringVar
 
 from ui.base_input_page import BaseInputPage
-
 from src.classroom import ClassroomType
 
 class ClassroomInputPage(BaseInputPage):
@@ -45,3 +44,6 @@ class ClassroomInputPage(BaseInputPage):
 	
 	def stringify_element(self, obj):
 		return "%s (%s)" % (obj["room_code"], ClassroomType(obj["room_type"]).pretty_print())
+	
+	def refresh_inputs(self):
+		pass

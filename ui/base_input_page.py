@@ -1,4 +1,5 @@
-from tkinter import Frame, Label, Button, Entry, OptionMenu, Listbox, Scrollbar, StringVar, filedialog
+from tkinter import Frame, Label, Button, Entry, OptionMenu, Checkbutton, \
+					Listbox, Scrollbar, StringVar, filedialog
 from PIL import Image
 from PIL.ImageTk import PhotoImage
 from os import environ
@@ -124,16 +125,21 @@ class BaseInputPage(BasePage, ABC):
 			self.set_current_filename(self.prompt_save_dialog())
 			self.clear_error_message()
 		elif input_option == InputOptionEnum.EDIT_EXISTING:
-			self.set_current_filename(self.prompt_open_dialog())
-			self.clear_error_message()
+			desired_filename = self.prompt_open_dialog()
+			if self.load_elements_from(desired_filename):
+				self.set_current_filename(desired_filename)
+				self.clear_error_message()
+			else:
+				err_s = desired_filename[desired_filename.rfind("/")+1:]
+				self.set_error_message("Loading data from %s was unsuccessful!" % err_s)
 		elif input_option == InputOptionEnum.COPY_EXISTING:
 			copy_from_filename = self.prompt_open_dialog(title="Select File to Copy From")
 			if copy_from_filename:
 				self.set_current_filename(self.prompt_save_dialog())
 				if self.current_filename:
 					if self.load_elements_from(copy_from_filename):
-						self.clear_error_message()
 						self.write_elements()
+						self.clear_error_message()
 					else:
 						err_s = copy_from_filename[copy_from_filename.rfind("/")+1:]
 						self.set_error_message("Loading data from %s was unsuccessful!" % err_s)
@@ -174,6 +180,7 @@ class BaseInputPage(BasePage, ABC):
 			i = int(current_selection[0])
 			self.deobjectify_element(self.backing_elements_list[i])
 			self.remove_element(at=i)
+			self.refresh_inputs()
 	
 	def remove_element(self, at=None):
 		indices = [at] if at else sorted((int(a) for a in self.elements_listbox.curselection()), reverse=True)
@@ -187,6 +194,7 @@ class BaseInputPage(BasePage, ABC):
 		self.backing_elements_list = []
 		self.elements_listbox.delete(0, "end")
 		self.clear_input_widgets()
+		self.refresh_inputs()
 	
 	def load_elements_from(self, filename):
 		try:
@@ -220,11 +228,15 @@ class BaseInputPage(BasePage, ABC):
 		raise NotImplementedError()
 	
 	@abstractmethod
-	def deobjectify_element(self):
+	def deobjectify_element(self, obj):
 		raise NotImplementedError()
 	
 	@abstractmethod
 	def stringify_element(self, obj):
+		raise NotImplementedError()
+	
+	@abstractmethod
+	def refresh_inputs(self):
 		raise NotImplementedError()
 	
 	@staticmethod
@@ -253,6 +265,8 @@ class BaseInputPage(BasePage, ABC):
 		elif input_field_type == "Button":
 			i = Button(f, *args, **kwargs)
 			i.image = kwargs.get("image")
+		elif input_field_type == "Checkbutton":
+			i = Checkbutton(f, *args, **kwargs)
 		else:
 			raise ValueError("Unsupported type of widget: %s" % input_field_type)
 		

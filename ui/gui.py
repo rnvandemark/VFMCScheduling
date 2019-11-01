@@ -16,7 +16,7 @@ class GUI(Frame):
 		Frame.__init__(self, *args, **kwargs)
 		
 		background_image = PhotoImage(
-			Image.open("./resources/vfmc_logo.jpeg").resize((400, 200), Image.ANTIALIAS))
+			Image.open("./resources/vfmc_logo.png").resize((400, 200), Image.ANTIALIAS))
 		background_label = Label(image=background_image)
 		background_label.image = background_image
 		background_label.pack(fill="x")
