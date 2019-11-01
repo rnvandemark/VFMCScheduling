@@ -14,6 +14,7 @@ class ProfessorInputPage(BaseInputPage):
 			"First Name",
 			"Entry",
 			textvariable=self.first_name_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((first_name_entry, self.first_name_var, ""))
 		
@@ -23,6 +24,7 @@ class ProfessorInputPage(BaseInputPage):
 			"Middle Name",
 			"Entry",
 			textvariable=self.middle_name_var,
+			f_pady=5,
 			required=False)
 		self.input_widget_descriptors.append((middle_name_entry, self.middle_name_var, ""))
 		
@@ -32,6 +34,7 @@ class ProfessorInputPage(BaseInputPage):
 			"Last Name",
 			"Entry",
 			textvariable=self.last_name_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((last_name_entry, self.last_name_var, ""))
 		
@@ -41,6 +44,7 @@ class ProfessorInputPage(BaseInputPage):
 			"Departments",
 			"Entry",
 			textvariable=self.depts_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((depts_entry, self.depts_var, ""))
 		
@@ -48,8 +52,8 @@ class ProfessorInputPage(BaseInputPage):
 			depts_frame,
 			"""
 				Enter a list of comma-seperated department codes that this\n
-				 professor can teach in. For example, physics, engineering,\n
-				 and math could look like \"PH,ENG,MA\" (Spaces are optional).
+				professor can teach in. For example, physics, engineering,\n
+				and math could look like \"PH,ENG,MA\" (spaces are optional).
 			""".replace("\n\t", "").replace("\t", "")
 		)
 	
