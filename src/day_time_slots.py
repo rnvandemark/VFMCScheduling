@@ -6,7 +6,8 @@ from src.day_of_week import DayOfWeek
 from src.time_range import TimeRange
 
 EARLIEST_START_TIME = time(hour=7)
-LATEST_START_TIME = time(hour=16)
+LATEST_START_TIME = time(hour=15)
+LUNCH_PERIOD = TimeRange(start=time(hour=11, minute=5), end=time(hour=12))
 
 class DayTimeSlots():
 	
@@ -64,19 +65,16 @@ class DayTimeSlots():
 		for desired_days in desired_days_list:
 			days_per_week = len(desired_days)
 			mins_per_day = floor(mins_per_week / days_per_week)
-			desired_time_range = TimeRange.normalize(
-				EARLIEST_START_TIME.hour, 
-				EARLIEST_START_TIME.minute,
-				0,
-				mins_per_day
-			)
+			desired_time_range = TimeRange.from_time_and_duration(EARLIEST_START_TIME, mins_per_day)
 			
 			existing_clashes = self.get_all_clashes_for(desired_days, desired_time_range, professor_bookings, restricted_tuples)
 			while len(existing_clashes) > 0:
 				latest_end = max(time_range.end for time_range in existing_clashes)
 				earliest_start = TimeRange.time_translated_by(latest_end, 0, MIN_MINS_BETWEEN_CLASSES)
 				
-				desired_time_range = TimeRange.normalize(earliest_start.hour, earliest_start.minute, 0, mins_per_day)
+				desired_time_range = TimeRange.from_time_and_duration(earliest_start, mins_per_day)
+				if desired_time_range.overlaps_with(LUNCH_PERIOD, include_buffer=False):
+					desired_time_range = TimeRange.from_time_and_duration(LUNCH_PERIOD.end, mins_per_day)
 				if desired_time_range.start > LATEST_START_TIME:
 					break
 				

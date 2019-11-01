@@ -107,6 +107,10 @@ class TimeRange(namedtuple("TimeRangeTuple", ["start", "end"])):
 		)
 	
 	@staticmethod
+	def from_time_and_duration(start_time, duration_minutes):
+		return TimeRange.normalize(start_time.hour, start_time.minute, 0, duration_minutes)
+	
+	@staticmethod
 	def time_as_dummy_datetime(time):
 		return datetime.combine(datetime(year=MINYEAR, month=1, day=1), time)
 	
