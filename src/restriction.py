@@ -3,6 +3,14 @@ from enum import Enum
 class RestrictionType(Enum):
 	SINGLE_GROUP = 1
 	MULTIPLE_GROUPS = 2
+	
+	def pretty_print(self):
+		if self == RestrictionType.SINGLE_GROUP:
+			return "Single Group"
+		elif self == RestrictionType.MULTIPLE_GROUPS:
+			return "Multiple Groups"
+		else:
+			raise ValueError("Unrecognized RestrictionType value: %s" % str(self))
 
 class Restriction():
 	

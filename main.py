@@ -64,10 +64,15 @@ def main():
 	elif MAIN_MODE == 3:
 		from tkinter import Tk
 		from ui.gui import GUI
+		from ui.base_input_page import BaseInputPage
 		
 		root = Tk()
+		
+		BaseInputPage.init_color_scheme(root, "#B88", "#DDD")
+		
 		gui = GUI(root)
 		gui.pack(side="top", fill="both", expand=True)
+		
 		root.wm_geometry("1200x600")
 		root.mainloop()
 	

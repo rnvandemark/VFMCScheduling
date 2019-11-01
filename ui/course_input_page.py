@@ -17,6 +17,7 @@ class CourseInputPage(BaseInputPage):
 			"Course Name",
 			"Entry",
 			textvariable=self.name_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((name_entry, self.name_var, ""))
 		
@@ -26,6 +27,7 @@ class CourseInputPage(BaseInputPage):
 			"Department Code",
 			"Entry",
 			textvariable=self.dept_code_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((dept_code_entry, self.dept_code_var, ""))
 		
@@ -35,6 +37,7 @@ class CourseInputPage(BaseInputPage):
 			"Course Number",
 			"Entry",
 			textvariable=self.course_number_var,
+			f_pady=5,
 			validate="key",
 			validatecommand=(left_frame.register(self.ensure_int), "%S"),
 			required=True)
@@ -48,6 +51,7 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.num_credits_var,
 			validate="key",
 			validatecommand=(left_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((num_credits_entry, self.num_credits_var, ""))
 		
@@ -59,6 +63,7 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.mins_per_week_var,
 			validate="key",
 			validatecommand=(left_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((mins_per_week_entry, self.mins_per_week_var, ""))
 		
@@ -70,21 +75,23 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.num_sections_var,
 			validate="key",
 			validatecommand=(left_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((num_sections_entry, self.num_sections_var, ""))
 		
 		self.room_type_options = {t.pretty_print():t.value for t in ClassroomType}
 		self.room_type_options_list = list(self.room_type_options.keys())
 		self.room_type_var = StringVar(left_frame)
-		_, _, room_type_entry = BaseInputPage.get_labeled_input_field(
+		_, _, room_type_menu = BaseInputPage.get_labeled_input_field(
 			left_frame,
 			"Classroom Type",
 			"OptionMenu",
 			self.room_type_var,
 			*self.room_type_options_list,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((
-			room_type_entry, self.room_type_var, self.room_type_options_list[0]))
+			room_type_menu, self.room_type_var, self.room_type_options_list[0]))
 		
 		right_frame = Frame(self.input_widgets_frame)
 		right_frame.pack(side="right", fill="x", expand=True)
@@ -96,6 +103,7 @@ class CourseInputPage(BaseInputPage):
 			"Checkbutton",
 			variable=self.has_lab_var,
 			command=self.update_lab_widget_states,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((has_lab_checkbtn, self.has_lab_var, 0))
 		
@@ -107,6 +115,7 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.lab_num_credits_var,
 			validate="key",
 			validatecommand=(right_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((self.lab_num_credits_entry, self.lab_num_credits_var, ""))
 		
@@ -118,6 +127,7 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.lab_mins_per_week_var,
 			validate="key",
 			validatecommand=(right_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((self.lab_mins_per_week_entry, self.lab_mins_per_week_var, ""))
 		
@@ -129,19 +139,21 @@ class CourseInputPage(BaseInputPage):
 			textvariable=self.lab_num_sections_var,
 			validate="key",
 			validatecommand=(left_frame.register(self.ensure_int), "%S"),
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((self.lab_num_sections_entry, self.lab_num_sections_var, ""))
 		
 		self.lab_room_type_var = StringVar(right_frame)
-		_, _, self.lab_room_type_entry = BaseInputPage.get_labeled_input_field(
+		_, _, self.lab_room_type_menu = BaseInputPage.get_labeled_input_field(
 			right_frame,
 			"Classroom Type",
 			"OptionMenu",
 			self.lab_room_type_var,
 			*self.room_type_options_list,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((
-			self.lab_room_type_entry, self.lab_room_type_var, self.room_type_options_list[0]))
+			self.lab_room_type_menu, self.lab_room_type_var, self.room_type_options_list[0]))
 		
 		self.update_lab_widget_states()
 	
@@ -154,14 +166,14 @@ class CourseInputPage(BaseInputPage):
 		return True
 	
 	def update_lab_widget_states(self):
-		s = "disabled" if self.has_lab_var.get() == 0 else "normal"
+		enabled = self.has_lab_var.get() == 1
 		for e in [
 			self.lab_num_credits_entry,
 			self.lab_mins_per_week_entry,
 			self.lab_num_sections_entry,
-			self.lab_room_type_entry
+			self.lab_room_type_menu
 		]:
-			e.config(state=s)
+			self.config_widget(e, enabled)
 	
 	def validate_input(self):
 		check_lab = (self.has_lab_var.get() == 0) or (

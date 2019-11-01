@@ -14,20 +14,22 @@ class ClassroomInputPage(BaseInputPage):
 			"Classroom Code",
 			"Entry",
 			textvariable=self.code_var,
+			f_pady=5,
 			required=True)
 		self.input_widget_descriptors.append((code_entry, self.code_var, ""))
 		
 		self.type_options = {t.pretty_print():t.value for t in ClassroomType}
 		type_options_list = list(self.type_options.keys())
 		self.type_var = StringVar(self.input_widgets_frame)
-		_, _, type_entry = BaseInputPage.get_labeled_input_field(
+		_, _, type_menu = BaseInputPage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Classroom Type",
 			"OptionMenu",
 			self.type_var,
 			*type_options_list,
+			f_pady=5,
 			required=True)
-		self.input_widget_descriptors.append((type_entry, self.type_var, type_options_list[0]))
+		self.input_widget_descriptors.append((type_menu, self.type_var, type_options_list[0]))
 	
 	def validate_input(self):
 		return len(self.code_var.get()) > 0
