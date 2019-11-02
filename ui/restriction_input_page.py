@@ -1,4 +1,4 @@
-from tkinter import Text, Scrollbar, StringVar
+from tkinter import Scrollbar, StringVar
 from Pmw import Balloon
 
 from ui.base_page import BasePage

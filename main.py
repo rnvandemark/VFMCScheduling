@@ -5,8 +5,8 @@ from ui.base_page import BasePage
 
 def main():
 	logging.basicConfig(
-		filename='log/scheduling.log',
-		format='%(asctime)s:%(levelname)s:%(message)s',
+		filename="./log/scheduling.log",
+		format="%(asctime)s:%(levelname)s:%(message)s",
 		level=logging.INFO
 	)
 	

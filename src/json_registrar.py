@@ -1,4 +1,3 @@
-import logging
 from json import load as json_load
 
 class CourseRegistrar():

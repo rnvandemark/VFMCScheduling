@@ -85,7 +85,7 @@ class ExcelWriter():
 			current_row = current_row + 1
 		
 		#
-		# Create the classroom page
+		# Create the course page
 		#
 		
 		current_row = 0

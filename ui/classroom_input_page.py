@@ -1,4 +1,4 @@
-from tkinter import Frame, Entry, StringVar
+from tkinter import StringVar
 
 from ui.base_page import BasePage
 from ui.base_input_page import BaseInputPage

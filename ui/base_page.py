@@ -25,6 +25,19 @@ class BasePage(Frame):
 	def hide(self):
 		self.place_forget()
 	
+	def config_widget(self, w, enabled, **kwargs):
+		kwargs["state"] = "normal" if enabled else "disabled"
+		
+		t = type(w)
+		if (t == Text) or (t == OptionMenu):
+			kwargs["fg"] = BasePage.COLOR_ENABLED_FOREGROUND if enabled else BasePage.COLOR_DISABLED_FOREGROUND
+			if t == OptionMenu:
+				kwargs["bg"] = BasePage.COLOR_ENABLED_BACKGROUND if enabled else BasePage.COLOR_DISABLED_BACKGROUND
+			else:
+				kwargs["bg"] = BasePage.COLOR_TEXT_ENABLED_BACKGROUND if enabled else BasePage.COLOR_DISABLED_BACKGROUND
+		
+		w.config(**kwargs)
+	
 	def prompt_open_dialog(
 		self,
 		initialdir=environ["HOME"],
@@ -89,18 +102,23 @@ class BasePage(Frame):
 			kwargs["disabledbackground"] = BasePage.COLOR_DISABLED_BACKGROUND
 			kwargs["disabledforeground"] = BasePage.COLOR_DISABLED_FOREGROUND
 			i = Entry(f, *args, **kwargs)
+			
 		elif input_field_type == "OptionMenu":
 			if len(args) < 2:
 				raise ValueError("There must be at least one dropdown option, along with the linked variable.")
 			args[0].set(args[1])
 			i = OptionMenu(f, *args, **kwargs)
+			
 		elif input_field_type == "Button":
 			i = Button(f, *args, **kwargs)
 			i.image = kwargs.get("image")
+			
 		elif input_field_type == "Checkbutton":
 			i = Checkbutton(f, *args, **kwargs)
+			
 		elif input_field_type == "Text":
 			i = Text(f, *args, **kwargs)
+			
 		else:
 			raise ValueError("Unsupported type of widget: %s" % input_field_type)
 		

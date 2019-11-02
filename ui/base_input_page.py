@@ -1,4 +1,4 @@
-from tkinter import Frame, Label, Button, Entry, OptionMenu, Listbox, Scrollbar, Text, StringVar
+from tkinter import Frame, Label, Button, Entry, Listbox, Scrollbar, Text, StringVar
 from PIL import Image
 from PIL.ImageTk import PhotoImage
 from functools import partial
@@ -106,19 +106,6 @@ class BaseInputPage(BasePage, ABC):
 	def clear_error_message(self):
 		self.set_error_message(None)
 	
-	def config_widget(self, w, enabled, **kwargs):
-		kwargs["state"] = "normal" if enabled else "disabled"
-		
-		t = type(w)
-		if (t == Text) or (t == OptionMenu):
-			kwargs["fg"] = BaseInputPage.COLOR_ENABLED_FOREGROUND if enabled else BaseInputPage.COLOR_DISABLED_FOREGROUND
-			if t == OptionMenu:
-				kwargs["bg"] = BaseInputPage.COLOR_ENABLED_BACKGROUND if enabled else BaseInputPage.COLOR_DISABLED_BACKGROUND
-			else:
-				kwargs["bg"] = BaseInputPage.COLOR_TEXT_ENABLED_BACKGROUND if enabled else BaseInputPage.COLOR_DISABLED_BACKGROUND
-		
-		w.config(**kwargs)
-	
 	def clear_input_widgets(self):
 		for input_field_tuple in self.input_widget_descriptors:
 			t = type(input_field_tuple[0])
@@ -135,6 +122,7 @@ class BaseInputPage(BasePage, ABC):
 		if input_option == InputOptionEnum.CREATE_NEW:
 			self.set_current_filename(self.prompt_save_dialog())
 			self.clear_error_message()
+			
 		elif input_option == InputOptionEnum.EDIT_EXISTING:
 			desired_filename = self.prompt_open_dialog()
 			if desired_filename:
@@ -146,6 +134,7 @@ class BaseInputPage(BasePage, ABC):
 					self.set_error_message("Loading data from %s was unsuccessful!" % err_s)
 			else:
 				self.set_error_message("Must select a valid file to open from!")
+				
 		elif input_option == InputOptionEnum.COPY_EXISTING:
 			copy_from_filename = self.prompt_open_dialog(title="Select File to Copy From")
 			if copy_from_filename:
