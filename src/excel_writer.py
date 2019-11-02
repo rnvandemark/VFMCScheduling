@@ -5,7 +5,7 @@ from src.booking import Booking
 class ExcelWriter():
 	
 	@staticmethod
-	def write_schedule(schedule, destination_file_name="/home/nick/Documents/test.xlsx"):
+	def write_schedule(schedule, destination_file_name):
 		wb = Workbook(destination_file_name)
 		
 		ws_professor = wb.add_worksheet("By Professor")

@@ -1,6 +1,7 @@
 from tkinter import Text, Scrollbar, StringVar
 from Pmw import Balloon
 
+from ui.base_page import BasePage
 from ui.base_input_page import BaseInputPage
 from src.restriction import RestrictionType
 
@@ -12,7 +13,7 @@ class RestrictionInputPage(BaseInputPage):
 		self.type_options = {t.pretty_print():t.value for t in RestrictionType}
 		type_options_list = list(self.type_options.keys())
 		self.type_var = StringVar(self.input_widgets_frame)
-		_, _, type_menu = BaseInputPage.get_labeled_input_field(
+		_, _, type_menu = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Restriction Type",
 			"OptionMenu",
@@ -22,7 +23,7 @@ class RestrictionInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((type_menu, self.type_var, type_options_list[0]))
 		
 		self.single_group_var = StringVar(self.input_widgets_frame)
-		single_group_frame, _, self.single_group_entry = BaseInputPage.get_labeled_input_field(
+		single_group_frame, _, self.single_group_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Single Group Course Codes",
 			"Entry",
@@ -31,7 +32,7 @@ class RestrictionInputPage(BaseInputPage):
 			required=True)
 		self.input_widget_descriptors.append((self.single_group_entry, self.single_group_var, ""))
 		
-		multiple_groups_frame, _, self.multiple_groups_text = BaseInputPage.get_labeled_input_field(
+		multiple_groups_frame, _, self.multiple_groups_text = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Multiple Groups Course Codes",
 			"Text",

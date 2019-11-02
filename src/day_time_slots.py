@@ -1,9 +1,9 @@
 from math import floor
 from datetime import time
 
-from src.scheduling import MIN_MINS_BETWEEN_CLASSES
 from src.day_of_week import DayOfWeek
 from src.time_range import TimeRange
+from src.constants import MIN_MINS_BETWEEN_CLASSES
 
 EARLIEST_START_TIME = time(hour=7)
 LATEST_START_TIME = time(hour=15)

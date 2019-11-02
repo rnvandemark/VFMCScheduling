@@ -1,5 +1,6 @@
 from tkinter import Frame, StringVar, IntVar
 
+from ui.base_page import BasePage
 from ui.base_input_page import BaseInputPage
 from src.classroom import ClassroomType
 
@@ -12,7 +13,7 @@ class CourseInputPage(BaseInputPage):
 		left_frame.pack(side="left", fill="x", expand=True)
 		
 		self.name_var = StringVar(left_frame)
-		_, _, name_entry = BaseInputPage.get_labeled_input_field(
+		_, _, name_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Course Name",
 			"Entry",
@@ -22,7 +23,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((name_entry, self.name_var, ""))
 		
 		self.dept_code_var = StringVar(left_frame)
-		_, _, dept_code_entry = BaseInputPage.get_labeled_input_field(
+		_, _, dept_code_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Department Code",
 			"Entry",
@@ -32,7 +33,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((dept_code_entry, self.dept_code_var, ""))
 		
 		self.course_number_var = StringVar(left_frame)
-		_, _, course_number_entry = BaseInputPage.get_labeled_input_field(
+		_, _, course_number_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Course Number",
 			"Entry",
@@ -44,7 +45,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((course_number_entry, self.course_number_var, ""))
 		
 		self.num_credits_var = StringVar(left_frame)
-		_, _, num_credits_entry = BaseInputPage.get_labeled_input_field(
+		_, _, num_credits_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Credit Count",
 			"Entry",
@@ -56,7 +57,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((num_credits_entry, self.num_credits_var, ""))
 		
 		self.mins_per_week_var = StringVar(left_frame)
-		_, _, mins_per_week_entry = BaseInputPage.get_labeled_input_field(
+		_, _, mins_per_week_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Minutes/Week",
 			"Entry",
@@ -68,7 +69,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((mins_per_week_entry, self.mins_per_week_var, ""))
 		
 		self.num_sections_var = StringVar(left_frame)
-		_, _, num_sections_entry = BaseInputPage.get_labeled_input_field(
+		_, _, num_sections_entry = BasePage.get_labeled_input_field(
 			left_frame,
 			"Section Count",
 			"Entry",
@@ -82,7 +83,7 @@ class CourseInputPage(BaseInputPage):
 		self.room_type_options = {t.pretty_print():t.value for t in ClassroomType}
 		self.room_type_options_list = list(self.room_type_options.keys())
 		self.room_type_var = StringVar(left_frame)
-		_, _, room_type_menu = BaseInputPage.get_labeled_input_field(
+		_, _, room_type_menu = BasePage.get_labeled_input_field(
 			left_frame,
 			"Classroom Type",
 			"OptionMenu",
@@ -97,7 +98,7 @@ class CourseInputPage(BaseInputPage):
 		right_frame.pack(side="right", fill="x", expand=True)
 		
 		self.has_lab_var = IntVar(right_frame)
-		_, _, has_lab_checkbtn = BaseInputPage.get_labeled_input_field(
+		_, _, has_lab_checkbtn = BasePage.get_labeled_input_field(
 			right_frame,
 			"Has a Lab",
 			"Checkbutton",
@@ -108,7 +109,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((has_lab_checkbtn, self.has_lab_var, 0))
 		
 		self.lab_num_credits_var = StringVar(right_frame)
-		_, _, self.lab_num_credits_entry = BaseInputPage.get_labeled_input_field(
+		_, _, self.lab_num_credits_entry = BasePage.get_labeled_input_field(
 			right_frame,
 			"Credit Count",
 			"Entry",
@@ -120,7 +121,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((self.lab_num_credits_entry, self.lab_num_credits_var, ""))
 		
 		self.lab_mins_per_week_var = StringVar(right_frame)
-		_, _, self.lab_mins_per_week_entry = BaseInputPage.get_labeled_input_field(
+		_, _, self.lab_mins_per_week_entry = BasePage.get_labeled_input_field(
 			right_frame,
 			"Minutes/Week",
 			"Entry",
@@ -132,7 +133,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((self.lab_mins_per_week_entry, self.lab_mins_per_week_var, ""))
 		
 		self.lab_num_sections_var = StringVar(right_frame)
-		_, _, self.lab_num_sections_entry = BaseInputPage.get_labeled_input_field(
+		_, _, self.lab_num_sections_entry = BasePage.get_labeled_input_field(
 			right_frame,
 			"Section Count",
 			"Entry",
@@ -144,7 +145,7 @@ class CourseInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((self.lab_num_sections_entry, self.lab_num_sections_var, ""))
 		
 		self.lab_room_type_var = StringVar(right_frame)
-		_, _, self.lab_room_type_menu = BaseInputPage.get_labeled_input_field(
+		_, _, self.lab_room_type_menu = BasePage.get_labeled_input_field(
 			right_frame,
 			"Classroom Type",
 			"OptionMenu",

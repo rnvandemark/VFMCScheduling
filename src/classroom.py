@@ -1,5 +1,7 @@
 from enum import Enum
 
+from src.day_time_slots import DayTimeSlots
+
 class ClassroomType(Enum):
 	STANDARD = "cr"
 	SCIENCE_LAB = "sl"
@@ -14,9 +16,6 @@ class ClassroomType(Enum):
 			return "Computer Lab"
 		else:
 			raise ValueError("Unrecognized value: %s" % str(self))
-
-# This was moved below ClassroomType to avoid a cyclical dependency
-from src.day_time_slots import DayTimeSlots
 
 class Classroom():
 	

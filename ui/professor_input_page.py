@@ -1,6 +1,7 @@
 from tkinter import StringVar
 from Pmw import Balloon
 
+from ui.base_page import BasePage
 from ui.base_input_page import BaseInputPage
 
 class ProfessorInputPage(BaseInputPage):
@@ -9,7 +10,7 @@ class ProfessorInputPage(BaseInputPage):
 		BaseInputPage.__init__(self, "Professor", *args, **kwargs)
 		
 		self.first_name_var = StringVar(self.input_widgets_frame)
-		_, _, first_name_entry = BaseInputPage.get_labeled_input_field(
+		_, _, first_name_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"First Name",
 			"Entry",
@@ -19,7 +20,7 @@ class ProfessorInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((first_name_entry, self.first_name_var, ""))
 		
 		self.middle_name_var = StringVar(self.input_widgets_frame)
-		_, _, middle_name_entry = BaseInputPage.get_labeled_input_field(
+		_, _, middle_name_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Middle Name",
 			"Entry",
@@ -29,7 +30,7 @@ class ProfessorInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((middle_name_entry, self.middle_name_var, ""))
 		
 		self.last_name_var = StringVar(self.input_widgets_frame)
-		_, _, last_name_entry = BaseInputPage.get_labeled_input_field(
+		_, _, last_name_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Last Name",
 			"Entry",
@@ -39,7 +40,7 @@ class ProfessorInputPage(BaseInputPage):
 		self.input_widget_descriptors.append((last_name_entry, self.last_name_var, ""))
 		
 		self.depts_var = StringVar(self.input_widgets_frame)
-		depts_frame, _, depts_entry = BaseInputPage.get_labeled_input_field(
+		depts_frame, _, depts_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Departments",
 			"Entry",

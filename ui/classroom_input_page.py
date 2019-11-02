@@ -1,5 +1,6 @@
 from tkinter import Frame, Entry, StringVar
 
+from ui.base_page import BasePage
 from ui.base_input_page import BaseInputPage
 from src.classroom import ClassroomType
 
@@ -9,7 +10,7 @@ class ClassroomInputPage(BaseInputPage):
 		BaseInputPage.__init__(self, "Classroom", *args, **kwargs)
 		
 		self.code_var = StringVar(self.input_widgets_frame)
-		_, _, code_entry = BaseInputPage.get_labeled_input_field(
+		_, _, code_entry = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Classroom Code",
 			"Entry",
@@ -21,7 +22,7 @@ class ClassroomInputPage(BaseInputPage):
 		self.type_options = {t.pretty_print():t.value for t in ClassroomType}
 		type_options_list = list(self.type_options.keys())
 		self.type_var = StringVar(self.input_widgets_frame)
-		_, _, type_menu = BaseInputPage.get_labeled_input_field(
+		_, _, type_menu = BasePage.get_labeled_input_field(
 			self.input_widgets_frame,
 			"Classroom Type",
 			"OptionMenu",

@@ -1,8 +1,6 @@
-from tkinter import Frame, Label, Button, Entry, OptionMenu, Checkbutton, \
-	Listbox, Scrollbar, Text, StringVar, filedialog
+from tkinter import Frame, Label, Button, Entry, OptionMenu, Listbox, Scrollbar, Text, StringVar
 from PIL import Image
 from PIL.ImageTk import PhotoImage
-from os import environ
 from functools import partial
 from abc import ABC, abstractmethod
 from json import load as json_load, dump as json_dump
@@ -11,12 +9,6 @@ from ui.base_page import BasePage
 from ui.input_option_enum import InputOptionEnum
 
 class BaseInputPage(BasePage, ABC):
-	
-	COLOR_TEXT_ENABLED_BACKGROUND = None
-	COLOR_ENABLED_BACKGROUND      = None
-	COLOR_ENABLED_FOREGROUND      = None
-	COLOR_DISABLED_BACKGROUND     = None
-	COLOR_DISABLED_FOREGROUND     = None
 	
 	def __init__(self, data_type, *args, **kwargs):
 		BasePage.__init__(self, *args, **kwargs)
@@ -46,7 +38,6 @@ class BaseInputPage(BasePage, ABC):
 		error_frame.config(height=100, width=200)
 		error_frame.pack(side="left", fill="x")
 		
-		self.error_message = None
 		self.error_message_var = StringVar(error_frame)
 		self.clear_error_message()
 		Label(
@@ -173,18 +164,6 @@ class BaseInputPage(BasePage, ABC):
 		else:
 			raise ValueError("Unrecognized input option: %s" % str(input_option))
 	
-	def prompt_open_dialog(self, initialdir=environ["HOME"], title="Select File to Open"):
-		return filedialog.askopenfilename(
-			initialdir=initialdir,
-			title=title,
-			filetypes=(("JSON files","*.json"), ("all files","*.*")))
-	
-	def prompt_save_dialog(self, initialdir=environ["HOME"], title="Input Save Location and Filename"):
-		return filedialog.asksaveasfilename(
-			initialdir=initialdir,
-			title=title,
-			filetypes=(("JSON files","*.json"), ("all files","*.*")))
-	
 	def add_element(self, clear=False):
 		if self.validate_input():
 			o = self.objectify_input()
@@ -265,57 +244,3 @@ class BaseInputPage(BasePage, ABC):
 	@abstractmethod
 	def refresh_inputs(self):
 		raise NotImplementedError()
-	
-	@staticmethod
-	def init_color_scheme(root, disabled_bg, disabled_fg, text_enabled_bg="#FFF"):
-		BaseInputPage.COLOR_TEXT_ENABLED_BACKGROUND = text_enabled_bg
-		BaseInputPage.COLOR_ENABLED_BACKGROUND      = root["bg"]
-		BaseInputPage.COLOR_ENABLED_FOREGROUND      = "#000"
-		BaseInputPage.COLOR_DISABLED_BACKGROUND     = disabled_bg
-		BaseInputPage.COLOR_DISABLED_FOREGROUND     = disabled_fg
-	
-	@staticmethod
-	def get_labeled_input_field(master, name, input_field_type, *args, **kwargs):
-		f = Frame(master)
-		f.pack(
-			side=kwargs.pop("f_side", "top"),
-			fill=kwargs.pop("f_fill", "y"),
-			padx=kwargs.pop("f_padx", 0),
-			pady=kwargs.pop("f_pady", 0),
-			expand=kwargs.pop("f_expand", True))
-		
-		r = kwargs.pop("required", False)
-		l = None
-		if name:
-			l = Label(f, text="%s%s: "%("*" if r else "",name))
-			l.pack(side=kwargs.pop("l_side", "left"), fill=kwargs.pop("l_fill", "x"), expand=kwargs.pop("l_expand", False))
-		
-		i = None
-		i_side = kwargs.pop("i_side", "right")
-		i_fill = kwargs.pop("i_fill", "x")
-		i_expand = kwargs.pop("i_expand", False)
-		
-		if input_field_type == "Entry":
-			kwargs["bg"] = BaseInputPage.COLOR_TEXT_ENABLED_BACKGROUND
-			kwargs["fg"] = BaseInputPage.COLOR_ENABLED_FOREGROUND
-			kwargs["disabledbackground"] = BaseInputPage.COLOR_DISABLED_BACKGROUND
-			kwargs["disabledforeground"] = BaseInputPage.COLOR_DISABLED_FOREGROUND
-			i = Entry(f, *args, **kwargs)
-		elif input_field_type == "OptionMenu":
-			if len(args) < 2:
-				raise ValueError("There must be at least one dropdown option, along with the linked variable.")
-			args[0].set(args[1])
-			i = OptionMenu(f, *args, **kwargs)
-		elif input_field_type == "Button":
-			i = Button(f, *args, **kwargs)
-			i.image = kwargs.get("image")
-		elif input_field_type == "Checkbutton":
-			i = Checkbutton(f, *args, **kwargs)
-		elif input_field_type == "Text":
-			i = Text(f, *args, **kwargs)
-		else:
-			raise ValueError("Unsupported type of widget: %s" % input_field_type)
-		
-		i.pack(side=i_side, fill=i_fill, expand=i_expand)
-		
-		return f, l, i
