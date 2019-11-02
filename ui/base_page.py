@@ -1,6 +1,13 @@
-from tkinter import Frame
+from tkinter import Frame, Label, Button, Entry, OptionMenu, Checkbutton, Text, filedialog
+from os import environ
 
 class BasePage(Frame):
+	
+	COLOR_TEXT_ENABLED_BACKGROUND = None
+	COLOR_ENABLED_BACKGROUND      = None
+	COLOR_ENABLED_FOREGROUND      = None
+	COLOR_DISABLED_BACKGROUND     = None
+	COLOR_DISABLED_FOREGROUND     = None
 	
 	def __init__(self, *args, **kwargs):
 		Frame.__init__(self, *args, **kwargs)
@@ -17,3 +24,86 @@ class BasePage(Frame):
 	
 	def hide(self):
 		self.place_forget()
+	
+	def prompt_open_dialog(
+		self,
+		initialdir=environ["HOME"],
+		title="Select File to Open",
+		filetypes=(("JSON files","*.json"), ("all files","*.*"))
+	):
+		return filedialog.askopenfilename(
+			initialdir=initialdir,
+			title=title,
+			filetypes=filetypes)
+	
+	def prompt_save_dialog(
+		self,
+		initialdir=environ["HOME"],
+		title="Input Save Location and Filename",
+		filetypes=(("JSON files","*.json"), ("all files","*.*"))
+	):
+		return filedialog.asksaveasfilename(
+			initialdir=initialdir,
+			title=title,
+			filetypes=filetypes)
+	
+	@staticmethod
+	def init_color_scheme(root, disabled_bg, disabled_fg, text_enabled_bg="#FFF"):
+		BasePage.COLOR_TEXT_ENABLED_BACKGROUND = text_enabled_bg
+		BasePage.COLOR_ENABLED_BACKGROUND      = root["bg"]
+		BasePage.COLOR_ENABLED_FOREGROUND      = "#000"
+		BasePage.COLOR_DISABLED_BACKGROUND     = disabled_bg
+		BasePage.COLOR_DISABLED_FOREGROUND     = disabled_fg
+	
+	@staticmethod
+	def get_labeled_input_field(master, name, input_field_type, *args, **kwargs):
+		f = Frame(master)
+		f.pack(
+			side=kwargs.pop("f_side", "top"),
+			fill=kwargs.pop("f_fill", "y"),
+			padx=kwargs.pop("f_padx", 0),
+			pady=kwargs.pop("f_pady", 0),
+			expand=kwargs.pop("f_expand", True))
+		
+		r = kwargs.pop("required", False)
+		l = None
+		if name:
+			l = Label(f, text="%s%s: "%("*" if r else "",name))
+			l.pack(
+				side=kwargs.pop("l_side", "left"),
+				fill=kwargs.pop("l_fill", "x"),
+				padx=kwargs.pop("l_padx", 0),
+				pady=kwargs.pop("l_pady", 0),
+				expand=kwargs.pop("l_expand", False))
+		
+		i = None
+		i_side = kwargs.pop("i_side", "right")
+		i_fill = kwargs.pop("i_fill", "x")
+		i_padx = kwargs.pop("i_padx", 0),
+		i_pady = kwargs.pop("i_pady", 0),
+		i_expand = kwargs.pop("i_expand", False)
+		
+		if input_field_type == "Entry":
+			kwargs["bg"] = BasePage.COLOR_TEXT_ENABLED_BACKGROUND
+			kwargs["fg"] = BasePage.COLOR_ENABLED_FOREGROUND
+			kwargs["disabledbackground"] = BasePage.COLOR_DISABLED_BACKGROUND
+			kwargs["disabledforeground"] = BasePage.COLOR_DISABLED_FOREGROUND
+			i = Entry(f, *args, **kwargs)
+		elif input_field_type == "OptionMenu":
+			if len(args) < 2:
+				raise ValueError("There must be at least one dropdown option, along with the linked variable.")
+			args[0].set(args[1])
+			i = OptionMenu(f, *args, **kwargs)
+		elif input_field_type == "Button":
+			i = Button(f, *args, **kwargs)
+			i.image = kwargs.get("image")
+		elif input_field_type == "Checkbutton":
+			i = Checkbutton(f, *args, **kwargs)
+		elif input_field_type == "Text":
+			i = Text(f, *args, **kwargs)
+		else:
+			raise ValueError("Unsupported type of widget: %s" % input_field_type)
+		
+		i.pack(side=i_side, fill=i_fill, expand=i_expand, padx=i_padx, pady=i_pady)
+		
+		return f, l, i

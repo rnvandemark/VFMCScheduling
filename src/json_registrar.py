@@ -1,13 +1,10 @@
 import logging
 from json import load as json_load
 
-def input_json_name(name):
-	return "./input_data/{0}.json".format(name)
-
 class CourseRegistrar():
 	
-	def __init__(self, json_file_name):
-		with open(input_json_name(json_file_name)) as json_file:
+	def __init__(self, json_file_url):
+		with open(json_file_url) as json_file:
 			self.course_list = json_load(json_file)
 	
 	def __str__(self):
@@ -15,8 +12,8 @@ class CourseRegistrar():
 
 class ProfessorRegistrar():
 	
-	def __init__(self, json_file_name):
-		with open(input_json_name(json_file_name)) as json_file:
+	def __init__(self, json_file_url):
+		with open(json_file_url) as json_file:
 			self.prof_list = json_load(json_file)
 	
 	def __str__(self):
@@ -33,8 +30,8 @@ class ProfessorRegistrar():
 
 class ClassroomRegistrar():
 	
-	def __init__(self, json_file_name):
-		with open(input_json_name(json_file_name)) as json_file:
+	def __init__(self, json_file_url):
+		with open(json_file_url) as json_file:
 			self.room_list = json_load(json_file)
 	
 	def __str__(self):
@@ -42,8 +39,8 @@ class ClassroomRegistrar():
 
 class RestrictionRegistrar():
 	
-	def __init__(self, json_file_name):
-		with open(input_json_name(json_file_name)) as json_file:
+	def __init__(self, json_file_url):
+		with open(json_file_url) as json_file:
 			self.restriction_list = json_load(json_file)
 	
 	def __str__(self):

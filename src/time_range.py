@@ -2,7 +2,7 @@ from math import floor
 from collections import namedtuple
 from datetime import time, datetime, timedelta, MINYEAR
 
-from src.scheduling import MIN_MINS_BETWEEN_CLASSES
+from src.constants import MIN_MINS_BETWEEN_CLASSES
 
 class TimeRange(namedtuple("TimeRangeTuple", ["start", "end"])):
 	

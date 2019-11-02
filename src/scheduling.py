@@ -3,20 +3,13 @@ from math import floor
 from random import shuffle, getrandbits
 from copy import deepcopy
 
-MIN_MINS_BETWEEN_CLASSES = 10
-
-OBJECTIVE_CREDITS_PER_PROFESSOR = 15
-OBJECTIVE_WEIGHT_PER_PROFESSOR = 3 * OBJECTIVE_CREDITS_PER_PROFESSOR
-
-FORCE_LAB_ON_ONE_DAY = True
-ATTEMPT_EVEN_DISTRIBUTION = True
-
+from src.classroom import *
 from src.json_registrar import *
 from src.schedulable_element import *
-from src.classroom import *
 from src.professor import *
 from src.restriction import *
 from src.booking import *
+from src.constants import OBJECTIVE_WEIGHT_PER_PROFESSOR, FORCE_LAB_ON_ONE_DAY, ATTEMPT_EVEN_DISTRIBUTION
 
 class Scheduler():
 	
@@ -88,7 +81,7 @@ class Scheduler():
 						course.restriction_count = course.restriction_count + 1
 						break
 				else:
-					logging.warning("Restriction for nonexistent department: %d" % course_number)
+					logging.warning("Restriction for nonexistent course: %s%d" % (dept_code, course_number))
 	
 	def update_relative_availabilities(self, reinitialize, dept_codes_list=None, existing_bookings={}):
 		dict_obj = None
@@ -239,12 +232,21 @@ class Scheduler():
 				courses_to_schedule.append(course)
 				self.update_relative_availabilities(False, dept_codes_list=scheduled_professor.departments, existing_bookings=bookings)
 				courses_to_schedule.sort(key=lambda c: self.get_element_sort_value(c))
-			
-			#print("\n".join(["{0}\n\t{1}\n\t{2}\n\t{3}".format(
-			#	c.name,
-			#	c.restriction_count,
-			#	self.dept_relative_availability[c.dept_code],
-			#	1 / self.dept_relative_availability[c.dept_code]
-			#) for c in courses_to_schedule]), end="\n\n")
 		
+		print("        ", end="\r")
 		return bookings
+	
+	def try_until_success(self):
+		retry = True
+		schedule = None
+		
+		while retry:
+			try:
+				schedule = self.plan()
+				retry = False
+			except KeyboardInterrupt:
+				raise
+			except:
+				pass
+		
+		return schedule
