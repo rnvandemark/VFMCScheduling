@@ -1,4 +1,4 @@
 __pycache__/
 tests/__pycache__/
 log/*.log
-input_data/FA19_*.json
+input_data/FA20_*.json

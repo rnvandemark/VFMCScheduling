@@ -80,8 +80,8 @@ class GenerationPage(BasePage):
 					scheduler = None
 					try:
 						scheduler = Scheduler(*self.gen_urls[:4])
-					except:
-						logging.error("Failed to create scheduler object.")
+					except Exception as e:
+						logging.error("Failed to create scheduler object: " + str(e))
 						self.set_status_message("One of the four provided files caused an error!", "#F00")
 						return
 					

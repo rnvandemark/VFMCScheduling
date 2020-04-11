@@ -139,11 +139,12 @@ class Scheduler():
 		
 		desired_classroom_list = self.classrooms_by_type[element.classroom_type]
 		
-		preferred_days_per_week = None
-		if FORCE_LAB_ON_ONE_DAY and (element_type == Lab):
-			preferred_days_per_week = 1
-		elif ATTEMPT_EVEN_DISTRIBUTION:
-			preferred_days_per_week = 2 + getrandbits(1)
+		# Just for now, because of the way it was requested this time
+		preferred_days_per_week = 2
+		#if FORCE_LAB_ON_ONE_DAY and (element_type == Lab):
+		#	preferred_days_per_week = 1
+		#elif ATTEMPT_EVEN_DISTRIBUTION:
+		#	preferred_days_per_week = 2 + getrandbits(1)
 		
 		# Gather restrictions from existing bookings. No need to worry about classes with the selected professor
 		# because those overlaps will be rejected in the DayTimeSlots' get_first_available routine, and we also

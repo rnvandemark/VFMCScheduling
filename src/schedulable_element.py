@@ -11,9 +11,9 @@ class SchedulableElement():
 		self.name = name
 		self.dept_code = dept_code
 		self.course_number = course_number
-		self.credit_count = json_obj["credit_count"]
-		self.mins_per_week = json_obj["standard_minutes_per_week"]
-		self.section_count = json_obj["section_count"]
+		self.credit_count = int(json_obj["credit_count"])
+		self.mins_per_week = int(json_obj["standard_minutes_per_week"])
+		self.section_count = int(json_obj["section_count"])
 		self.classroom_type = ClassroomType(json_obj["room_type"])
 		self.scheduled_sections = 0
 		self.restriction_count = 0

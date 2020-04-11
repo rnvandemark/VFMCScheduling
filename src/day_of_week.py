@@ -36,8 +36,7 @@ class DayOfWeek(Enum):
 		elif num_days == 2:
 			return [
 				DayOfWeek.list_from_string("TR"),
-				DayOfWeek.list_from_string("MW"),
-				DayOfWeek.list_from_string("MF")
+				DayOfWeek.list_from_string("MW")
 			]
 		elif num_days == 3:
 			return [

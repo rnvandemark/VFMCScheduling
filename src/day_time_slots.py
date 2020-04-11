@@ -5,9 +5,25 @@ from src.day_of_week import DayOfWeek
 from src.time_range import TimeRange
 from src.constants import MIN_MINS_BETWEEN_CLASSES
 
-EARLIEST_START_TIME = time(hour=7)
-LATEST_START_TIME = time(hour=15)
+EARLIEST_START_TIMES = {
+	DayOfWeek.SUNDAY: time(hour=7),
+	DayOfWeek.MONDAY: time(hour=7),
+	DayOfWeek.TUESDAY: time(hour=8, minute=25),
+	DayOfWeek.WEDNESDAY: time(hour=7),
+	DayOfWeek.THURSDAY: time(hour=8, minute=25),
+	DayOfWeek.FRIDAY: time(hour=7),
+	DayOfWeek.SATURDAY: time(hour=7)
+}
+LATEST_START_TIME = time(hour=13, minute=25)
 LUNCH_PERIOD = TimeRange(start=time(hour=11, minute=5), end=time(hour=12))
+
+def allowable_start_time_of(days_of_week):
+	earliest_start_time = EARLIEST_START_TIMES[days_of_week[0]]
+	for i in range(1, len(days_of_week)):
+		t = EARLIEST_START_TIMES[days_of_week[i]]
+		if t > earliest_start_time:
+			t = earliest_start_time
+	return earliest_start_time
 
 class DayTimeSlots():
 	
@@ -65,7 +81,10 @@ class DayTimeSlots():
 		for desired_days in desired_days_list:
 			days_per_week = len(desired_days)
 			mins_per_day = floor(mins_per_week / days_per_week)
-			desired_time_range = TimeRange.from_time_and_duration(EARLIEST_START_TIME, mins_per_day)
+			desired_time_range = TimeRange.from_time_and_duration(
+				allowable_start_time_of(desired_days),
+				mins_per_day
+			)
 			
 			existing_clashes = self.get_all_clashes_for(desired_days, desired_time_range, professor_bookings, restricted_tuples)
 			while len(existing_clashes) > 0:
