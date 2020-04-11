@@ -178,6 +178,7 @@ class Scheduler():
 					element.mins_per_week,
 					existing_bookings.get(desired_professor, []),
 					restricted_tuples,
+					attempt_even_distribution=ATTEMPT_EVEN_DISTRIBUTION,
 					preferred_days_per_week=preferred_days_per_week
 				)
 			

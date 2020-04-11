@@ -1,5 +1,6 @@
 from math import floor
 from datetime import time
+from random import getrandbits
 
 from src.day_of_week import DayOfWeek
 from src.time_range import TimeRange
@@ -57,7 +58,14 @@ class DayTimeSlots():
 		
 		return clashes
 	
-	def get_first_available(self, mins_per_week, professor_bookings, restricted_tuples, preferred_days_per_week=None):
+	def get_first_available(
+		self,
+		mins_per_week,
+		professor_bookings,
+		restricted_tuples,
+		attempt_even_distribution=False,
+		preferred_days_per_week=None
+	):
 		if not preferred_days_per_week:
 			preferred_days_per_week = 3
 		
@@ -73,6 +81,10 @@ class DayTimeSlots():
 			days_per_week = 3
 			
 		desired_days_list = DayOfWeek.optimal_lists_for(days_per_week)
+		if attempt_even_distribution and (len(desired_days_list) > 1) and (getrandbits(1) == 1):	
+			temp_day = desired_days_list[0]
+			desired_days_list[0] = desired_days_list[1]
+			desired_days_list[1] = temp_day
 		
 		found_days = None
 		found_time_range = None
