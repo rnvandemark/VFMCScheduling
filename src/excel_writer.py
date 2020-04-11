@@ -1,6 +1,7 @@
 from xlsxwriter import Workbook
 
 from src.booking import Booking
+from src.day_of_week import DayOfWeek
 
 class ExcelWriter():
 	
@@ -11,6 +12,7 @@ class ExcelWriter():
 		ws_professor = wb.add_worksheet("By Professor")
 		ws_classroom = wb.add_worksheet("By Classroom")
 		ws_course = wb.add_worksheet("By Course")
+		ws_times = wb.add_worksheet("By Times")
 		
 		section_title_format = wb.add_format({"bold": True})
 		subsection_title_format = wb.add_format({"italic": True})
@@ -110,14 +112,52 @@ class ExcelWriter():
 				ws_course.write(current_row, 1, "Sctn #%d" % e[0])
 				ws_course.merge_range(current_row, 2, current_row, 4, e[1].get_stylized_name())
 				for b in e[2]:
+					ws_course.write(current_row, 5, b[1].code)
 					ws_course.merge_range(
 						current_row,
-						5,
+						6,
 						current_row,
-						7,
+						8,
 						"%s, %s" % ("".join(d.value for d in b[0].days), b[0].time_range.pretty_print())
 					)
 					current_row = current_row + 1
+			
+			current_row = current_row + 1
+		
+		#
+		# Create the times page
+		#
+		
+		current_row = 0
+		
+		all_booking_dtrps_by_day = DayOfWeek.get_empty_dict(list)
+		for prof_bookings in schedule.values():
+			for booking in prof_bookings:
+				for block in booking.blocks:
+					all_booking_dtrps_by_day[block[0].days[0]].append((block[0], booking.element, booking.section_number, booking.professor, block[1]))
+		
+		for day in DayOfWeek:
+			all_booking_dtrps_by_day[day].sort(key=lambda e: e[0])
+			
+			ws_times.merge_range(current_row, 0, current_row, 2, str(day), section_title_format)
+			current_row = current_row + 1
+			
+			for booking_dtrp in all_booking_dtrps_by_day[day]:
+				ws_times.merge_range(
+					current_row,
+					0,
+					current_row,
+					2,
+					"%s, %s" % ("".join(d.value for d in booking_dtrp[0].days), booking_dtrp[0].time_range.pretty_print()),
+					subsection_title_format
+				)
+				ws_times.merge_range(current_row, 3, current_row, 5, booking_dtrp[1].name)
+				ws_times.write(current_row, 6, booking_dtrp[1].as_programmatic_string())
+				ws_times.write(current_row, 7, "Sctn #%d" % booking_dtrp[2])
+				ws_times.merge_range(current_row, 8, current_row, 10, booking_dtrp[3].get_stylized_name())
+				ws_times.write(current_row, 11, booking_dtrp[4].code)
+				
+				current_row = current_row + 1
 			
 			current_row = current_row + 1
 		
