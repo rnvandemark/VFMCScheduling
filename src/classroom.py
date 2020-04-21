@@ -22,6 +22,7 @@ class Classroom():
 	def __init__(self, json_obj):
 		self.code = json_obj["room_code"]
 		self.type = ClassroomType(json_obj["room_type"])
+		self.occupancy = int(json_obj["room_occupancy"])
 		self.slots = DayTimeSlots()
 	
 	def business(self):

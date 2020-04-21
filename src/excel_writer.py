@@ -39,12 +39,18 @@ class ExcelWriter():
 				ws_professor.write(current_row, 4, "Sctn #%d" % booking.section_number)
 				current_row = current_row + 1
 				for block in booking.blocks:
-					ws_professor.write(current_row, 1, block[1].code)
 					ws_professor.merge_range(
 						current_row,
-						2,
+						1,
 						current_row,
-						4,
+						2,
+						"{0} ({1})".format(block[1].code, block[1].occupancy)
+					)
+					ws_professor.merge_range(
+						current_row,
+						3,
+						current_row,
+						5,
 						"%s, %s" % ("".join(d.value for d in block[0].days), block[0].time_range.pretty_print())
 					)
 					current_row = current_row + 1
@@ -67,7 +73,14 @@ class ExcelWriter():
 		
 		for classroom, booking_elements in bookings_by_classroom.items():
 			booking_elements.sort(key=lambda e: (e[3], e[0].name, e[1], e[2]))
-			ws_classroom.merge_range(current_row, 0, current_row, 1, classroom.code, section_title_format)
+			ws_classroom.merge_range(
+				current_row,
+				0,
+				current_row,
+				1,
+				"{0} ({1})".format(classroom.code, classroom.occupancy),
+				section_title_format
+			)
 			current_row = current_row + 1
 			
 			for e in booking_elements:
@@ -112,12 +125,18 @@ class ExcelWriter():
 				ws_course.write(current_row, 1, "Sctn #%d" % e[0])
 				ws_course.merge_range(current_row, 2, current_row, 4, e[1].get_stylized_name())
 				for b in e[2]:
-					ws_course.write(current_row, 5, b[1].code)
 					ws_course.merge_range(
 						current_row,
-						6,
+						5,
 						current_row,
-						8,
+						6,
+						"{0} ({1})".format(b[1].code, b[1].occupancy)
+					)
+					ws_course.merge_range(
+						current_row,
+						7,
+						current_row,
+						9,
 						"%s, %s" % ("".join(d.value for d in b[0].days), b[0].time_range.pretty_print())
 					)
 					current_row = current_row + 1
@@ -155,8 +174,13 @@ class ExcelWriter():
 				ws_times.write(current_row, 6, booking_dtrp[1].as_programmatic_string())
 				ws_times.write(current_row, 7, "Sctn #%d" % booking_dtrp[2])
 				ws_times.merge_range(current_row, 8, current_row, 10, booking_dtrp[3].get_stylized_name())
-				ws_times.write(current_row, 11, booking_dtrp[4].code)
-				
+				ws_times.merge_range(
+					current_row,
+					11,
+					current_row,
+					12,
+					"{0} ({1})".format(booking_dtrp[4].code, booking_dtrp[4].occupancy)
+				)
 				current_row = current_row + 1
 			
 			current_row = current_row + 1
