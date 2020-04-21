@@ -11,6 +11,7 @@ class BasePage(Frame):
 	
 	def __init__(self, *args, **kwargs):
 		Frame.__init__(self, *args, **kwargs)
+		self.last_dialog_dir = None
 	
 	def place_(self, in_=None, x=0, y=0, relwidth=1, relheight=1):
 		self.place(in_=in_, x=x, y=y, relwidth=relwidth, relheight=relheight)
@@ -38,27 +39,46 @@ class BasePage(Frame):
 		
 		w.config(**kwargs)
 	
+	def get_prompt_initial_dir(self):
+		return self.last_dialog_dir if self.last_dialog_dir else environ["HOME"]
+	
+	def issue_file_dialog(self, dialog_dir):
+		if dialog_dir:
+			last_index = dialog_dir.rfind("/")
+			if last_index > 0:
+				self.last_dialog_dir = dialog_dir[:last_index]
+			else:
+				self.last_dialog_dir = "/"
+		
+		return dialog_dir
+	
 	def prompt_open_dialog(
 		self,
-		initialdir=environ["HOME"],
+		initialdir=None,
 		title="Select File to Open",
 		filetypes=(("JSON files","*.json"), ("all files","*.*"))
 	):
-		return filedialog.askopenfilename(
+		if not initialdir:
+			initialdir = self.get_prompt_initial_dir()
+		return self.issue_file_dialog(filedialog.askopenfilename(
 			initialdir=initialdir,
 			title=title,
-			filetypes=filetypes)
+			filetypes=filetypes
+		))
 	
 	def prompt_save_dialog(
 		self,
-		initialdir=environ["HOME"],
+		initialdir=None,
 		title="Input Save Location and Filename",
 		filetypes=(("JSON files","*.json"), ("all files","*.*"))
 	):
-		return filedialog.asksaveasfilename(
+		if not initialdir:
+			initialdir = self.get_prompt_initial_dir()
+		return self.issue_file_dialog(filedialog.asksaveasfilename(
 			initialdir=initialdir,
 			title=title,
-			filetypes=filetypes)
+			filetypes=filetypes
+		))
 	
 	@staticmethod
 	def init_color_scheme(root, disabled_bg, disabled_fg, text_enabled_bg="#FFF"):
